@@ -91,6 +91,14 @@ const navItems: NavItem[] = [
     icon: ScrollText,
     description: 'Immutable cryptographic trail',
   },
+  {
+    name: 'UI Design System',
+    path: '/design-system',
+    icon: Layers,
+    badge: 'UI KIT',
+    badgeVariant: 'cyan',
+    description: 'Reusable atomic components',
+  },
 ]
 
 export const Sidebar: React.FC<SidebarProps> = ({
