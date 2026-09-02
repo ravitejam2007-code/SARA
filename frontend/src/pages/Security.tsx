@@ -1,178 +1,178 @@
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   ShieldCheck,
-  Lock,
-  KeyRound,
   RefreshCw,
 } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card'
+
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { StatusIndicator } from '@/components/ui/StatusIndicator'
-import { useEnclave } from '@/hooks/useEnclave'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { useToast } from '@/components/ui/Toast'
+
+import {
+  securityApi,
+  setSecurityProvenanceMode,
+  getSecurityProvenanceMode,
+} from '@/services/securityApi'
+import type {
+  SovereigntySummary,
+  LocalServiceHealthItem,
+  NetworkMonitorEntry,
+  AuditTimelineEntry,
+  SecurityEvent,
+  DataSourceOrigin,
+} from '@/types/security'
+
+import { TransparencyBanner } from '@/components/security/TransparencyBanner'
+import { SovereigntySummaryGrid } from '@/components/security/SovereigntySummaryGrid'
+import { LocalServiceHealth } from '@/components/security/LocalServiceHealth'
+import { NetworkMonitor } from '@/components/security/NetworkMonitor'
+import { AuditTimeline } from '@/components/security/AuditTimeline'
+import { SecurityEventsFeed } from '@/components/security/SecurityEventsFeed'
 
 export const Security: React.FC = () => {
-  const { status, toggleAirGap, refreshAttestation } = useEnclave()
+  const { toast } = useToast()
+
+  // Provenance Mode (DEV_TEST_DATA by default, switchable to LIVE_API or UNAVAILABLE)
+  const [provenanceMode, setProvenanceMode] = useState<DataSourceOrigin>(
+    getSecurityProvenanceMode()
+  )
+
+  // Telemetry States
+  const [summary, setSummary] = useState<SovereigntySummary | null>(null)
+  const [services, setServices] = useState<LocalServiceHealthItem[]>([])
+  const [networkEntries, setNetworkEntries] = useState<NetworkMonitorEntry[]>([])
+  const [auditEntries, setAuditEntries] = useState<AuditTimelineEntry[]>([])
+  const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>([])
+
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  // Fetch all telemetry according to active provenance mode
+  const fetchAllTelemetry = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const [sum, srvs, net, aud, evs] = await Promise.all([
+        securityApi.getSovereigntySummary(),
+        securityApi.getLocalServicesHealth(),
+        securityApi.getNetworkMonitorEntries(),
+        securityApi.getAuditTimeline(),
+        securityApi.getSecurityEvents(),
+      ])
+
+      setSummary(sum)
+      setServices(srvs)
+      setNetworkEntries(net)
+      setAuditEntries(aud)
+      setSecurityEvents(evs)
+    } catch {
+      toast.error('Telemetry Error', 'Failed to retrieve telemetry data.')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [toast])
+
+  useEffect(() => {
+    fetchAllTelemetry()
+  }, [fetchAllTelemetry, provenanceMode])
+
+  // Handle Mode Change
+  const handleModeChange = (newMode: DataSourceOrigin) => {
+    setSecurityProvenanceMode(newMode)
+    setProvenanceMode(newMode)
+    if (newMode === 'LIVE_API') {
+      toast.info(
+        'Switched to LIVE API Mode',
+        'Attempting direct connection to backend telemetry microservices.'
+      )
+    } else if (newMode === 'DEV_TEST_DATA') {
+      toast.warning(
+        'Switched to DEV / TEST Mode',
+        'Displaying simulated test fixtures. Not evidence of real air gap.'
+      )
+    } else {
+      toast.info(
+        'Switched to UNAVAILABLE Mode',
+        'Simulating missing/unprovisioned backend telemetry endpoints.'
+      )
+    }
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-5">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl sm:text-2xl font-mono font-bold tracking-wider text-slate-100 uppercase">
-              SOVEREIGN ENCLAVE & CRYPTOGRAPHIC SECURITY
-            </h1>
-            <Badge variant="emerald" size="sm" dot>
-              ZERO-TRUST
-            </Badge>
+    <div className="space-y-6 font-mono text-text-primary pb-8">
+      {/* 1. Page Header */}
+      <div className="rounded-lg bg-surface border border-border p-5 shadow-industrial">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-wider text-text-primary uppercase flex items-center gap-2">
+                <span>SECURITY, SOVEREIGNTY & AUDIT</span>
+              </h1>
+              <p className="text-xs text-text-secondary">
+                Confidential Hardware Telemetry • Air-Gap Network Egress • Immutable Cryptographic Audit Log
+              </p>
+            </div>
           </div>
-          <p className="text-xs font-mono text-slate-400 mt-1">
-            Hardware-enforced confidential computing boundaries, TPM 2.0 attestation, and air-gap telemetry.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<RefreshCw className="w-4 h-4" />}
-            onClick={refreshAttestation}
-          >
-            ATTEST HARDWARE
-          </Button>
-          <Button
-            variant={status.airGapVerified ? 'destructive' : 'primary'}
-            size="sm"
-            leftIcon={<Lock className="w-4 h-4" />}
-            onClick={toggleAirGap}
-          >
-            {status.airGapVerified ? 'ISOLATION OVERRIDE' : 'RE-ENGAGE AIR-GAP'}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchAllTelemetry}
+              isLoading={isLoading}
+              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+            >
+              Sync Telemetry
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Primary Enclave Posture Matrix */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400">HARDWARE ENCLAVE</span>
-            <StatusIndicator status="secure" pulse />
-          </div>
-          <div className="mt-2 text-xl font-mono font-bold text-slate-100">{status.enclaveId}</div>
-          <div className="text-[11px] font-mono text-slate-400 mt-1">Intel SGX2 / AMD SEV-SNP</div>
-        </Card>
+      {/* 2. Transparency Banner (Provenance Notice & Dev Selector) */}
+      <TransparencyBanner
+        currentMode={provenanceMode}
+        onModeChange={handleModeChange}
+      />
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400">AIR-GAP BOUNDARY</span>
-            <Badge variant={status.airGapVerified ? 'emerald' : 'amber'} size="sm">
-              {status.airGapVerified ? 'STRICT' : 'PERMISSIVE'}
-            </Badge>
-          </div>
-          <div className="mt-2 text-xl font-mono font-bold text-slate-100">
-            {status.airGapVerified ? '100% ISOLATED' : 'WARNING DEGRADED'}
-          </div>
-          <div className="text-[11px] font-mono text-slate-400 mt-1">0 B outbound egress</div>
-        </Card>
+      {/* 3. Sovereignty Summary Grid (5 Metrics with Provenance) */}
+      {isLoading && !summary ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} variant="rectangular" height={130} />
+          ))}
+        </div>
+      ) : (
+        <SovereigntySummaryGrid summary={summary} isLoading={isLoading} />
+      )}
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400">CRYPTO INTEGRITY</span>
-            <Badge variant="cyan" size="sm">
-              FIPS 140-3
-            </Badge>
-          </div>
-          <div className="mt-2 text-xl font-mono font-bold text-cyan-400">
-            {status.cryptographicIntegrity.toFixed(1)}%
-          </div>
-          <div className="text-[11px] font-mono text-slate-400 mt-1">Zero bit rot or tampering</div>
-        </Card>
+      {/* 4. Local Service Health (7 Sovereign Components) */}
+      {isLoading && services.length === 0 ? (
+        <Skeleton variant="rectangular" height={280} />
+      ) : (
+        <LocalServiceHealth services={services} />
+      )}
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400">HSM HEARTBEAT</span>
-            <span className="text-xs font-mono text-emerald-400">{status.lastHeartbeat}</span>
-          </div>
-          <div className="mt-2 text-xl font-mono font-bold text-slate-100">SYNCED</div>
-          <div className="text-[11px] font-mono text-slate-400 mt-1">Local hardware atomic clock</div>
-        </Card>
-      </div>
+      {/* 5. Network Monitor (Egress & IPC Intercept Log) */}
+      {isLoading && networkEntries.length === 0 ? (
+        <Skeleton variant="rectangular" height={240} />
+      ) : (
+        <NetworkMonitor entries={networkEntries} />
+      )}
 
-      {/* Enclave Security Modules */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <KeyRound className="w-4 h-4 text-cyan-400" />
-              CRYPTOGRAPHIC ROOTS OF TRUST
-            </CardTitle>
-            <CardDescription>
-              Hardware-sealed master encryption keys
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 font-mono text-xs">
-            <div className="p-3 rounded bg-slate-950 border border-slate-800 space-y-1">
-              <div className="flex items-center justify-between text-slate-200">
-                <span className="font-semibold text-cyan-300">KEY-ROOT-001 (TPM Endorsement Key)</span>
-                <Badge variant="emerald" size="sm">SEALED</Badge>
-              </div>
-              <p className="text-slate-500 text-[11px] truncate">
-                Fingerprint: SHA256:7f92a104bcde83210984daffe902194
-              </p>
-            </div>
+      {/* 6. Cryptographic Audit Timeline */}
+      {isLoading && auditEntries.length === 0 ? (
+        <Skeleton variant="rectangular" height={280} />
+      ) : (
+        <AuditTimeline entries={auditEntries} />
+      )}
 
-            <div className="p-3 rounded bg-slate-950 border border-slate-800 space-y-1">
-              <div className="flex items-center justify-between text-slate-200">
-                <span className="font-semibold text-cyan-300">KEY-WEIGHTS-DECRYPT (Model Enclave)</span>
-                <Badge variant="emerald" size="sm">IN-MEMORY</Badge>
-              </div>
-              <p className="text-slate-500 text-[11px] truncate">
-                Fingerprint: SHA256:91ac398e01bf284091c7810aa61c201
-              </p>
-            </div>
-
-            <div className="p-3 rounded bg-slate-950 border border-slate-800 space-y-1">
-              <div className="flex items-center justify-between text-slate-200">
-                <span className="font-semibold text-cyan-300">KEY-AUDIT-SIGN (Ledger Seal Key)</span>
-                <Badge variant="cyan" size="sm">ED25519</Badge>
-              </div>
-              <p className="text-slate-500 text-[11px] truncate">
-                Fingerprint: SHA256:3409bcde11904af80173298a0029b4e
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              AIR-GAP BOUNDARY CONTROLS
-            </CardTitle>
-            <CardDescription>
-              Hardware isolation policy enforcement
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 font-mono text-xs">
-            {[
-              { rule: 'WAN Interface Physical Link', state: 'DISCONNECTED', secure: true },
-              { rule: 'USB Mass Storage Ingestion Port', state: 'HARDWARE READ-ONLY', secure: true },
-              { rule: 'Direct Memory Access (IOMMU)', state: 'ENFORCED ISOLATION', secure: true },
-              { rule: 'Electromagnetic Emanation (TEMPEST)', state: 'LEVEL-B COMPLIANT', secure: true },
-              { rule: 'Outbound DNS / NTP Exfiltration', state: 'HARDWARE BLOCKED', secure: true },
-            ].map((r) => (
-              <div
-                key={r.rule}
-                className="p-2.5 rounded bg-slate-950 border border-slate-800 flex items-center justify-between"
-              >
-                <span className="text-slate-300">{r.rule}</span>
-                <span className="text-emerald-400 font-semibold">{r.state}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+      {/* 7. Security Events Feed */}
+      {isLoading && securityEvents.length === 0 ? (
+        <Skeleton variant="rectangular" height={220} />
+      ) : (
+        <SecurityEventsFeed events={securityEvents} />
+      )}
     </div>
   )
 }
