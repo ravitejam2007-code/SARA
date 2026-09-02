@@ -30,6 +30,8 @@ export interface UserProfile {
   sessionExpiresAt?: string
 }
 
+export type User = UserProfile
+
 export interface AuthCredentials {
   username: string
   password: string

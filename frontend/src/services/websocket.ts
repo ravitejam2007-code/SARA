@@ -6,47 +6,111 @@ import type {
   ModelSelectionInfo,
   SourceCitation,
   GeneratedArtifact,
+  HumanApprovalRequestPayload,
 } from '@/types/workspace'
+import { isDemoModeActive } from '@/utils/demoMode'
 
 /**
- * Zenith AI — Sovereign WebSocket Service Abstraction
+ * Zenith AI — Sovereign WebSocket Client & Gateway
  *
- * Provides a clean interface for real-time streaming agent communication,
- * allowing the backend WebSocket connection to be attached seamlessly later.
- * Includes a deterministic simulation engine for frontend development and testing.
+ * Connects to the FastAPI backend WebSocket stream for real-time agent telemetry:
+ * - agent status
+ * - tool calls
+ * - model selection & reasoning rationale
+ * - progress updates
+ * - errors & timeouts
+ * - completion & artifact compilation
+ * - human approval requests (Human-in-the-Loop)
+ *
+ * When VITE_DEMO_MODE is active and the backend is unreachable, seamlessly
+ * falls back to the deterministic enclave simulator.
  */
+
+const WS_BASE_URL: string =
+  import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:8000/ws'
 
 export interface IAgentWebSocketService {
   connect(sessionId: string): Promise<void>
   disconnect(): void
   sendMessage(content: string, attachments?: UploadedAttachment[]): void
   sendStop(): void
+  sendApproval(approvalId: string, approved: boolean, rationale?: string): void
   onMessage(callback: (msg: WebSocketAgentEvent) => void): () => void
   isConnected(): boolean
 }
 
-export class MockAgentWebSocketService implements IAgentWebSocketService {
-  private connected = false
+export class SovereignAgentWebSocketService implements IAgentWebSocketService {
+  private socket: WebSocket | null = null
   private sessionId = 'default-session'
   private listeners: ((msg: WebSocketAgentEvent) => void)[] = []
   private activeTimers: ReturnType<typeof setTimeout>[] = []
   private isProcessing = false
+  private isSimulating = false
 
   async connect(sessionId: string): Promise<void> {
     this.sessionId = sessionId
-    this.connected = true
-    console.info(`[Zenith AgentWS] Subscribed to sovereign session: ${sessionId}`)
+
+    // Attempt real WebSocket connection first
+    try {
+      const url = `${WS_BASE_URL}/${sessionId}`
+      this.socket = new WebSocket(url)
+
+      this.socket.onopen = () => {
+        console.info(`[Zenith AgentWS] Live WebSocket connected to sovereign gateway: ${url}`)
+        this.isSimulating = false
+        this.emit({
+          type: 'agent:status',
+          sessionId: this.sessionId,
+          payload: { status: 'ONLINE', mode: 'LIVE_WEBSOCKET' },
+          timestamp: new Date().toLocaleTimeString(),
+        })
+      }
+
+      this.socket.onmessage = (event: MessageEvent) => {
+        try {
+          const parsed = JSON.parse(event.data) as WebSocketAgentEvent
+          this.emit(parsed)
+        } catch {
+          console.warn('[Zenith AgentWS] Received non-JSON payload:', event.data)
+        }
+      }
+
+      this.socket.onerror = (err) => {
+        console.warn('[Zenith AgentWS] Live WebSocket encountered error:', err)
+      }
+
+      this.socket.onclose = () => {
+        if (!isDemoModeActive()) {
+          this.emit({
+            type: 'agent:error',
+            sessionId: this.sessionId,
+            payload: { message: 'WebSocket connection to FastAPI gateway closed.' },
+            timestamp: new Date().toLocaleTimeString(),
+          })
+        } else {
+          // In Demo Mode: Seamless fallback to enclave simulation engine
+          this.isSimulating = true
+        }
+      }
+    } catch {
+      if (isDemoModeActive()) {
+        this.isSimulating = true
+      }
+    }
   }
 
   disconnect(): void {
     this.sendStop()
-    this.connected = false
+    if (this.socket) {
+      this.socket.close()
+      this.socket = null
+    }
     this.listeners = []
-    console.info('[Zenith AgentWS] Disconnected from sovereign session')
+    this.isSimulating = false
   }
 
   isConnected(): boolean {
-    return this.connected
+    return (this.socket && this.socket.readyState === WebSocket.OPEN) || this.isSimulating
   }
 
   onMessage(callback: (msg: WebSocketAgentEvent) => void): () => void {
@@ -60,7 +124,37 @@ export class MockAgentWebSocketService implements IAgentWebSocketService {
     this.listeners.forEach((l) => l(event))
   }
 
+  sendApproval(approvalId: string, approved: boolean, rationale?: string): void {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(
+        JSON.stringify({
+          type: 'agent:human_approval_response',
+          sessionId: this.sessionId,
+          payload: { approvalId, approved, rationale },
+          timestamp: new Date().toISOString(),
+        })
+      )
+    }
+
+    this.emit({
+      type: 'agent:human_approval_resolved',
+      sessionId: this.sessionId,
+      payload: { approvalId, approved, rationale },
+      timestamp: new Date().toLocaleTimeString(),
+    })
+  }
+
   sendStop(): void {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(
+        JSON.stringify({
+          type: 'agent:stop',
+          sessionId: this.sessionId,
+          timestamp: new Date().toISOString(),
+        })
+      )
+    }
+
     if (!this.isProcessing) return
     this.isProcessing = false
     this.clearAllTimers()
@@ -68,8 +162,8 @@ export class MockAgentWebSocketService implements IAgentWebSocketService {
     this.emit({
       type: 'agent:stopped',
       sessionId: this.sessionId,
-      payload: { message: 'Agent execution halted by operator override.' },
-      timestamp: new Date().toISOString(),
+      payload: { reason: 'Operator requested emergency abort' },
+      timestamp: new Date().toLocaleTimeString(),
     })
   }
 
@@ -78,299 +172,260 @@ export class MockAgentWebSocketService implements IAgentWebSocketService {
     this.activeTimers = []
   }
 
-  sendMessage(_content: string, attachments?: UploadedAttachment[]): void {
-    this.sendStop()
+  sendMessage(content: string, attachments?: UploadedAttachment[]): void {
+    // If live WebSocket is connected, send real payload
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(
+        JSON.stringify({
+          type: 'agent:user_message',
+          sessionId: this.sessionId,
+          payload: { content, attachments },
+          timestamp: new Date().toISOString(),
+        })
+      )
+      return
+    }
+
+    // Otherwise, if Demo Mode is enabled, execute deterministic simulation
+    if (isDemoModeActive()) {
+      this.executeSimulationPipeline(content, attachments)
+    }
+  }
+
+  private executeSimulationPipeline(content: string, attachments?: UploadedAttachment[]) {
+    this.clearAllTimers()
     this.isProcessing = true
 
     const hasAttachment = attachments && attachments.length > 0
-    const filename = hasAttachment ? attachments[0].name : 'Turbine_Blade_Assembly.step'
+    const attachmentNames = attachments?.map((a) => a.name).join(', ') || ''
 
-    // 1. Agent Start Event
+    // 1. Dispatch Status: Reasoning
     this.emit({
-      type: 'agent:start',
+      type: 'agent:status',
       sessionId: this.sessionId,
-      payload: {
-        task: hasAttachment
-          ? `Ingest and analyze engineering asset: ${filename}`
-          : 'Deterministic Thermal Stress & Structural Simulation',
-      },
-      timestamp: new Date().toISOString(),
+      payload: { status: 'REASONING', description: 'Autonomous agent reasoning initiated' },
+      timestamp: new Date().toLocaleTimeString(),
     })
 
-    // 2. Step 1: File Received
-    const t1 = setTimeout(() => {
+    // 2. Select Model & Reasoning Rationale
+    const tModel = setTimeout(() => {
       if (!this.isProcessing) return
-      const step1: AgentStep = {
-        id: 'step-1',
-        stepNumber: 1,
-        title: `File received: ${filename}`,
-        status: 'completed',
-        elapsedMs: 84,
-        outputSummary: 'Binary checksum sha256:d8a9... validated within enclave buffer',
-      }
+
+      const modelInfo: ModelSelectionInfo = hasAttachment
+        ? {
+            modelName: 'DeepCAD-Vision-v2 + Zenith-Engineer-70B',
+            taskType: 'Multi-Modal Geometric & Thermal Analysis',
+            reasonForSelection: `Detected technical attachment(s) [${attachmentNames}]. Dispatched to on-premise vision encoder and 70B FP8 reasoning engine.`,
+            modelStatus: 'ACTIVE',
+            latencyMs: 38,
+            contextWindow: '128k Tokens (Hardware Enclave)',
+          }
+        : {
+            modelName: 'Zenith-Engineer-70B-FP8',
+            taskType: 'Engineering Physics & Structured Logic Reasoning',
+            reasonForSelection:
+              'Selected local 70B parameter model with specialized mechanical engineering and thermodynamics fine-tuning.',
+            modelStatus: 'ACTIVE',
+            latencyMs: 14,
+            contextWindow: '128k Tokens (Hardware Enclave)',
+          }
+
       this.emit({
-        type: 'agent:step',
+        type: 'agent:model_selected',
         sessionId: this.sessionId,
-        payload: { step: step1 },
-        timestamp: new Date().toISOString(),
+        payload: modelInfo,
+        timestamp: new Date().toLocaleTimeString(),
+      })
+
+      // Emit Progress: 25%
+      this.emit({
+        type: 'agent:progress',
+        sessionId: this.sessionId,
+        payload: { progressPercent: 25, currentStage: 'Model Selection & Query Decomposition' },
+        timestamp: new Date().toLocaleTimeString(),
       })
     }, 400)
-    this.activeTimers.push(t1)
+    this.activeTimers.push(tModel)
 
-    // 3. Step 2: OCR & Text Extractor Tool
-    const t2 = setTimeout(() => {
+    // 3. Step 1: Ingestion & OCR
+    const tStep1 = setTimeout(() => {
       if (!this.isProcessing) return
-      const ocrTool: ToolCallItem = {
-        id: 'tool-ocr-01',
-        tool: 'OCR',
-        status: 'completed',
-        input: `Extract geometric tolerance notes & callouts from ${filename}`,
-        output: 'Extracted 14 GD&T tolerances: Perpendicularity 0.02mm, Max Operating Temp 1450°C, Alloy: Inconel 718',
-        elapsedMs: 310,
-        timestamp: '14:21:02 UTC',
-      }
-      this.emit({
-        type: 'agent:tool_call',
-        sessionId: this.sessionId,
-        payload: { toolCall: ocrTool },
-        timestamp: new Date().toISOString(),
-      })
 
-      const step2: AgentStep = {
-        id: 'step-2',
-        stepNumber: 2,
-        title: 'OCR completed & GD&T annotations extracted',
+      const step: AgentStep = {
+        id: `step-${Date.now()}-1`,
+        stepNumber: 1,
+        title: hasAttachment
+          ? `Ingesting & OCR scanning "${attachmentNames}"`
+          : 'Parsing engineering instructions & extracting parameters',
         status: 'completed',
-        toolName: 'OCR',
-        elapsedMs: 310,
+        toolName: hasAttachment ? 'OCR' : undefined,
+        elapsedMs: 240,
+        outputSummary: hasAttachment
+          ? 'Optical character recognition extracted 4 dimensional callouts and material spec Inconel 718.'
+          : 'Query parsed into 2 sub-tasks: stress calculation and regulatory verification.',
       }
+
       this.emit({
         type: 'agent:step',
         sessionId: this.sessionId,
-        payload: { step: step2 },
-        timestamp: new Date().toISOString(),
+        payload: step,
+        timestamp: new Date().toLocaleTimeString(),
       })
-    }, 1100)
-    this.activeTimers.push(t2)
+    }, 900)
+    this.activeTimers.push(tStep1)
 
-    // 4. Step 3: RAG Search & Sources
-    const t3 = setTimeout(() => {
+    // 4. Step 2: RAG Vector Search & Citations
+    const tStep2 = setTimeout(() => {
       if (!this.isProcessing) return
-      const ragTool: ToolCallItem = {
-        id: 'tool-rag-02',
+
+      const toolCall: ToolCallItem = {
+        id: `tool-${Date.now()}-1`,
         tool: 'RAG Search',
         status: 'completed',
-        input: 'Query: Inconel 718 thermal expansion coefficient & yield strength at 1200C',
-        output: 'Retrieved 3 matched vectors from AEROSPACE-TURBINE-ONTOLOGY (Cosine: 0.984)',
-        elapsedMs: 195,
-        timestamp: '14:21:03 UTC',
+        input: 'Query sovereign Qdrant collection: Inconel 718 thermal yield limit ISO 1982',
+        output: 'Retrieved 3 authoritative chunks (Cosine similarity > 0.94). Matched ISO 1982 Section 4.8.',
+        elapsedMs: 180,
+        timestamp: new Date().toLocaleTimeString(),
       }
+
       this.emit({
         type: 'agent:tool_call',
         sessionId: this.sessionId,
-        payload: { toolCall: ragTool },
-        timestamp: new Date().toISOString(),
+        payload: toolCall,
+        timestamp: new Date().toLocaleTimeString(),
       })
 
-      const sources: SourceCitation[] = [
+      const citations: SourceCitation[] = [
         {
           id: 'src-1',
           filename: 'ISO_1982_Gas_Turbine_Blades_Stress_Limits.pdf',
           page: 42,
           relevance: 98.4,
+          snippet:
+            'Section 4.8.2: Maximum allowable plastic strain for Inconel 718 blade root under 1100°C shall not exceed 0.20% per 10,000 equivalent operating hours.',
           fileType: 'ISO',
-          snippet: 'Section 4.8: For Nickel-base superalloys (Inconel 718) operating above 1100°C, the allowable plastic strain shall not exceed 0.2% per 10,000 equivalent operating hours.',
         },
         {
           id: 'src-2',
-          filename: 'Turbine-Assembly-Hydraulics-Spec-Rev4.step',
-          page: 1,
-          relevance: 94.1,
-          fileType: 'STEP',
-          snippet: 'Geometric boundary definition: Leading edge root fillet radius R=3.50mm, trailing edge cooling channel diameter d=1.20mm.',
-        },
-        {
-          id: 'src-3',
-          filename: 'Metallurgy_Fatigue_Inconel718_Lab_Data.xml',
-          page: 7,
-          relevance: 89.6,
-          fileType: 'XML',
-          snippet: 'Experimental yield strength at 1200°C: 680 MPa. Thermal conductivity k = 22.4 W/(m·K).',
+          filename: 'Inconel_718_Creep_Fatigue_Technical_Spec.pdf',
+          page: 18,
+          relevance: 95.1,
+          snippet:
+            'Yield strength at 650°C is 680 MPa. Secondary creep regime exhibits steady-state strain rate of 1.4e-8 s^-1.',
+          fileType: 'PDF',
         },
       ]
+
       this.emit({
         type: 'agent:sources',
         sessionId: this.sessionId,
-        payload: { sources },
-        timestamp: new Date().toISOString(),
+        payload: citations,
+        timestamp: new Date().toLocaleTimeString(),
       })
 
-      const step3: AgentStep = {
-        id: 'step-3',
-        stepNumber: 3,
-        title: 'RAG searched & local ontology vectors aligned',
-        status: 'completed',
-        toolName: 'RAG Search',
-        elapsedMs: 195,
-      }
       this.emit({
-        type: 'agent:step',
+        type: 'agent:progress',
         sessionId: this.sessionId,
-        payload: { step: step3 },
-        timestamp: new Date().toISOString(),
+        payload: { progressPercent: 60, currentStage: 'Sovereign Knowledge Retrieval & Tool Calls' },
+        timestamp: new Date().toLocaleTimeString(),
       })
-    }, 2000)
-    this.activeTimers.push(t3)
+    }, 1600)
+    this.activeTimers.push(tStep2)
 
-    // 5. Step 4: Model Selection & Rationale
-    const t4 = setTimeout(() => {
-      if (!this.isProcessing) return
-      const modelInfo: ModelSelectionInfo = {
-        modelName: 'Zenith-Engineer-70B-FP8 + DeepCAD-Vision',
-        taskType: 'Multimodal Boundary-Representation & Thermal FEM',
-        reasonForSelection:
-          'Selected for deterministic FP8 tensor performance and specialized boundary representation (B-Rep) geometric parsing.',
-        modelStatus: 'ACTIVE',
-        latencyMs: 14,
-        contextWindow: '128K',
-      }
-      this.emit({
-        type: 'agent:model_selected',
-        sessionId: this.sessionId,
-        payload: { modelInfo },
-        timestamp: new Date().toISOString(),
-      })
-
-      const pythonTool: ToolCallItem = {
-        id: 'tool-py-03',
-        tool: 'Python',
-        status: 'completed',
-        input: `import numpy as np\n# Solve Von Mises Stress Matrix\nsigma_vm = np.sqrt(0.5 * ((s1 - s2)**2 + (s2 - s3)**2 + (s3 - s1)**2))\nprint(f"Peak Stress: {np.max(sigma_vm):.2f} MPa")`,
-        output: 'Peak Von Mises Stress: 542.80 MPa (Safety Factor: 1.25, Pass Threshold: 1.15)',
-        elapsedMs: 420,
-        timestamp: '14:21:04 UTC',
-      }
-      this.emit({
-        type: 'agent:tool_call',
-        sessionId: this.sessionId,
-        payload: { toolCall: pythonTool },
-        timestamp: new Date().toISOString(),
-      })
-
-      const step4: AgentStep = {
-        id: 'step-4',
-        stepNumber: 4,
-        title: 'Python thermal stress solver executed in sandbox',
-        status: 'completed',
-        toolName: 'Python',
-        elapsedMs: 420,
-      }
-      this.emit({
-        type: 'agent:step',
-        sessionId: this.sessionId,
-        payload: { step: step4 },
-        timestamp: new Date().toISOString(),
-      })
-    }, 3100)
-    this.activeTimers.push(t4)
-
-    // 6. Step 5: Streaming Token Delivery
-    const tokens = [
-      '### Deterministic Thermal & Structural Evaluation\n\n',
-      'The multi-physics inspection for **',
-      filename,
-      '** has completed across the sovereign enclave cluster.\n\n',
-      '#### 1. Key Engineering Findings\n',
-      '- **Material**: Inconel 718 (Nickel-Chromium Superalloy)\n',
-      '- **Operating Temperature Boundary**: `1,450°C`\n',
-      '- **Peak Von Mises Stress**: `542.80 MPa` localized at leading edge root fillet (`R=3.50mm`)\n',
-      '- **Yield Safety Margin**: **`1.25x`** (Meets ISO 1982 requirement of `≥ 1.15x`)\n\n',
-      '```python\n',
-      '# Verification code executed in sovereign sandbox\n',
-      'def verify_thermal_compliance(peak_stress_mpa: float, yield_limit_mpa: float) -> bool:\n',
-      '    safety_factor = yield_limit_mpa / peak_stress_mpa\n',
-      '    return safety_factor >= 1.15  # ISO 1982 Section 4.8\n\n',
-      'assert verify_thermal_compliance(542.80, 680.0) == True\n',
-      '```\n\n',
-      '#### 2. Recommendation\n',
-      'The blade root cooling channels maintain acceptable convective heat transfer. All geometric tolerances conform to aerospace manufacturing boundaries.',
-    ]
-
-    tokens.forEach((chunk, index) => {
-      const t = setTimeout(() => {
+    // 5. Human-in-the-Loop Approval Request (If sensitive command)
+    if (content.toLowerCase().includes('isolate') || content.toLowerCase().includes('override') || content.toLowerCase().includes('approve')) {
+      const tApproval = setTimeout(() => {
         if (!this.isProcessing) return
-        this.emit({
-          type: 'agent:token',
-          sessionId: this.sessionId,
-          payload: { text: chunk },
-          timestamp: new Date().toISOString(),
-        })
-      }, 3500 + index * 100)
-      this.activeTimers.push(t)
-    })
 
-    // 7. Step 6: Artifact Generation & Completion
-    const totalDelay = 3500 + tokens.length * 100 + 400
-    const tFinal = setTimeout(() => {
+        const approvalPayload: HumanApprovalRequestPayload = {
+          approvalId: `appr-${Date.now().toString(36)}`,
+          actionTitle: 'Authorize Emergency Pneumatic Valve Actuation',
+          description: 'Autonomous reasoning identified critical coolant transient. Operator confirmation required to commit actuation signal to field bus.',
+          toolName: 'Code Sandbox / Hardware Interlock',
+          riskLevel: 'CRITICAL',
+          params: { valveId: 'V-102', pressureDropBarPerSec: 0.42, isolationWindowMs: 80 },
+        }
+
+        this.emit({
+          type: 'agent:human_approval_request',
+          sessionId: this.sessionId,
+          payload: approvalPayload,
+          timestamp: new Date().toLocaleTimeString(),
+        })
+      }, 2100)
+      this.activeTimers.push(tApproval)
+    }
+
+    // 6. Token Streaming Simulation
+    const tStream = setTimeout(() => {
       if (!this.isProcessing) return
+
+      const streamChunks = [
+        '### Sovereign Engineering Assessment\n\n',
+        'Based on verified on-premise standards and multi-physics verification:\n\n',
+        '1. **Material Compliance**: Evaluated against **ISO 1982 Section 4.8.2**.\n',
+        '2. **Peak Root Stress**: Calculated at `542.80 MPa` with ambient boundary temperature `650°C`.\n',
+        '3. **Yield Margin**: Material yield limit is `680.00 MPa` yielding an effective safety factor of **`1.25x`**.\n\n',
+        '```python\n# Von Mises Stress Matrix Verification\nimport numpy as np\nsigma_x, sigma_y, tau_xy = 480.0, 120.0, 85.0\nvon_mises = np.sqrt(sigma_x**2 - sigma_x*sigma_y + sigma_y**2 + 3*tau_xy**2)\nassert von_mises < 680.0, "Yield threshold exceeded!"\n```\n\n',
+        '**Certified Disposition**: The component fulfills dimensional clearance tolerances. Official deliverable artifact compiled below.\n',
+      ]
+
+      streamChunks.forEach((chunk, idx) => {
+        const tChunk = setTimeout(() => {
+          if (!this.isProcessing) return
+          this.emit({
+            type: 'agent:token',
+            sessionId: this.sessionId,
+            payload: { token: chunk },
+            timestamp: new Date().toLocaleTimeString(),
+          })
+        }, idx * 120)
+        this.activeTimers.push(tChunk)
+      })
+    }, 2400)
+    this.activeTimers.push(tStream)
+
+    // 7. Deliverable Compilation & Completion
+    const tArtifact = setTimeout(() => {
+      if (!this.isProcessing) return
+
       const artifact: GeneratedArtifact = {
-        id: 'art-01',
-        filename: 'Turbine_Blade_Thermal_Stress_Report.pdf',
+        id: `art-${Date.now()}`,
+        filename: 'Turbine_Blade_Thermal_Stress_Certified_Report.pdf',
         fileType: 'PDF',
         size: '14.8 MB',
         status: 'READY',
-        createdAt: 'Just now',
+        createdAt: new Date().toLocaleTimeString(),
       }
+
       this.emit({
         type: 'agent:artifact',
         sessionId: this.sessionId,
-        payload: { artifact },
-        timestamp: new Date().toISOString(),
+        payload: artifact,
+        timestamp: new Date().toLocaleTimeString(),
       })
 
-      const docTool: ToolCallItem = {
-        id: 'tool-doc-04',
-        tool: 'Document Generator',
-        status: 'completed',
-        input: 'Assemble engineering compliance certification report & SHA-256 seal',
-        output: 'Created Turbine_Blade_Thermal_Stress_Report.pdf (SHA256: 8f4a...d91c)',
-        elapsedMs: 280,
-        timestamp: '14:21:07 UTC',
-      }
       this.emit({
-        type: 'agent:tool_call',
+        type: 'agent:progress',
         sessionId: this.sessionId,
-        payload: { toolCall: docTool },
-        timestamp: new Date().toISOString(),
-      })
-
-      const step5: AgentStep = {
-        id: 'step-5',
-        stepNumber: 5,
-        title: 'Generated deliverable artifact & sealed report',
-        status: 'completed',
-        toolName: 'Document Generator',
-        elapsedMs: 280,
-      }
-      this.emit({
-        type: 'agent:step',
-        sessionId: this.sessionId,
-        payload: { step: step5 },
-        timestamp: new Date().toISOString(),
+        payload: { progressPercent: 100, currentStage: 'Complete' },
+        timestamp: new Date().toLocaleTimeString(),
       })
 
       this.emit({
         type: 'agent:complete',
         sessionId: this.sessionId,
-        payload: { totalElapsedMs: 4200 },
-        timestamp: new Date().toISOString(),
+        payload: { totalTokens: 3420, totalElapsedMs: 3200 },
+        timestamp: new Date().toLocaleTimeString(),
       })
 
       this.isProcessing = false
-    }, totalDelay)
-    this.activeTimers.push(tFinal)
+    }, 3600)
+    this.activeTimers.push(tArtifact)
   }
 }
 
-// Export singleton instance
-export const agentWebSocketService: IAgentWebSocketService = new MockAgentWebSocketService()
+// Global Singleton Export
+export const agentWebSocketService = new SovereignAgentWebSocketService()
+export const agentWs = agentWebSocketService
+export default agentWebSocketService

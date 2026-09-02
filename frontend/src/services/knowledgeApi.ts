@@ -1,4 +1,5 @@
 import { apiClient } from './api'
+import { isDemoModeActive } from '@/utils/demoMode'
 import type {
   KnowledgeDocument,
   KnowledgeStats,
@@ -191,7 +192,8 @@ export const knowledgeApi = {
         params,
       })
       return response.data
-    } catch {
+    } catch (err) {
+      if (!isDemoModeActive()) throw err
       await new Promise((r) => setTimeout(r, 200))
       let list = [...mockKnowledgeDocs]
 
@@ -224,7 +226,8 @@ export const knowledgeApi = {
     try {
       const response = await apiClient.get<KnowledgeStats>('/knowledge/stats')
       return response.data
-    } catch {
+    } catch (err) {
+      if (!isDemoModeActive()) throw err
       await new Promise((r) => setTimeout(r, 150))
       const total = mockKnowledgeDocs.length
       const indexed = mockKnowledgeDocs.filter((d) => d.indexingStatus === 'INDEXED').length
@@ -310,7 +313,8 @@ export const knowledgeApi = {
         query,
       })
       return response.data
-    } catch {
+    } catch (err) {
+      if (!isDemoModeActive()) throw err
       await new Promise((r) => setTimeout(r, 350))
 
       // Realistic mock matches based on query terms

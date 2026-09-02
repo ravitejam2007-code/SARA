@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Menu,
@@ -17,6 +17,7 @@ import { Modal, ModalBody, ModalFooter } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
 import { useEnclave } from '@/hooks/useEnclave'
+import { isDemoModeActive, setDemoModeActive, subscribeDemoModeChange } from '@/utils/demoMode'
 import type { UserRole } from '@/types'
 
 interface HeaderProps {
@@ -28,6 +29,17 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobile }) => {
   const navigate = useNavigate()
   const { user, role, logout, isSessionExpired, dismissSessionExpired, simulateSessionExpired } = useAuth()
   const { status } = useEnclave()
+  const [demoMode, setDemoMode] = useState<boolean>(isDemoModeActive())
+
+  useEffect(() => {
+    return subscribeDemoModeChange((active) => setDemoMode(active))
+  }, [])
+
+  const handleToggleDemoMode = () => {
+    const next = !demoMode
+    setDemoMode(next)
+    setDemoModeActive(next)
+  }
 
   // Format breadcrumb path
   const pathSegments = location.pathname.split('/').filter(Boolean)
@@ -101,6 +113,25 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobile }) => {
               Ctrl + K
             </kbd>
           </div>
+
+          {/* SIH Demo Mode Toggle Pill */}
+          <button
+            type="button"
+            onClick={handleToggleDemoMode}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[10px] font-mono font-bold tracking-wider transition-colors cursor-pointer ${
+              demoMode
+                ? 'bg-amber-950/70 border-amber-600/70 text-amber-300 hover:bg-amber-900/70'
+                : 'bg-emerald-950/70 border-emerald-600/70 text-emerald-300 hover:bg-emerald-900/70'
+            }`}
+            title="Click to toggle between SIH Presentation Demo Mode and Live FastAPI Backend Mode"
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${
+                demoMode ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'
+              }`}
+            />
+            <span>{demoMode ? 'SIH DEMO MODE' : 'LIVE BACKEND'}</span>
+          </button>
 
           {/* Simulate Session Expiry Button (for testing Requirement 10) */}
           <button

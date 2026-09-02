@@ -91,15 +91,29 @@ export interface ChatMessage {
 // WebSocket Event Payloads
 export type WebSocketAgentEventType =
   | 'agent:start'
+  | 'agent:status'
   | 'agent:step'
+  | 'agent:progress'
   | 'agent:token'
   | 'agent:tool_call'
   | 'agent:model_selected'
   | 'agent:sources'
   | 'agent:artifact'
+  | 'agent:human_approval_request'
+  | 'agent:human_approval_resolved'
   | 'agent:complete'
   | 'agent:error'
   | 'agent:stopped'
+
+export interface HumanApprovalRequestPayload {
+  approvalId: string
+  actionTitle: string
+  description: string
+  toolName: string
+  riskLevel: 'CRITICAL' | 'HIGH' | 'MEDIUM'
+  params: Record<string, unknown>
+  timeoutSeconds?: number
+}
 
 export interface WebSocketAgentEvent {
   type: WebSocketAgentEventType

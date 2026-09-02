@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   ScrollText,
   Search,
@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
+import { auditApi } from '@/services/auditApi'
 import type { AuditLogEntry } from '@/types'
 
 const initialLogs: AuditLogEntry[] = [
@@ -61,8 +62,16 @@ const initialLogs: AuditLogEntry[] = [
 ]
 
 export const AuditLogs: React.FC = () => {
+  const [logs, setLogs] = useState<AuditLogEntry[]>(initialLogs)
   const [searchTerm, setSearchTerm] = useState('')
   const [copiedHash, setCopiedHash] = useState<string | null>(null)
+
+  useEffect(() => {
+    auditApi
+      .getAuditLogs()
+      .then((data) => setLogs(data))
+      .catch((err) => console.warn('[Zenith Audit] Backend logs unreachable:', err))
+  }, [])
 
   const handleCopyHash = (hash: string) => {
     navigator.clipboard.writeText(hash)
@@ -70,7 +79,20 @@ export const AuditLogs: React.FC = () => {
     setTimeout(() => setCopiedHash(null), 2000)
   }
 
-  const filtered = initialLogs.filter(
+  const handleExport = async () => {
+    try {
+      const blob = await auditApi.exportAuditManifest()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `zenith_audit_manifest_${Date.now()}.json`
+      a.click()
+    } catch (e) {
+      console.error('Failed to export audit manifest', e)
+    }
+  }
+
+  const filtered = logs.filter(
     (l) =>
       l.actor.toLowerCase().includes(searchTerm.toLowerCase()) ||
       l.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -100,6 +122,7 @@ export const AuditLogs: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
+            onClick={handleExport}
             leftIcon={<Download className="w-4 h-4" />}
           >
             EXPORT AUDIT MANIFEST

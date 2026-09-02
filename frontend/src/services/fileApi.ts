@@ -1,4 +1,5 @@
 import { apiClient } from './api'
+import { isDemoModeActive } from '@/utils/demoMode'
 import type { DocumentItem, DocumentFilterParams, DocumentType } from '@/types/document'
 
 /**
@@ -158,7 +159,8 @@ export const fileApi = {
     try {
       const response = await apiClient.get<DocumentItem[]>('/documents', { params })
       return response.data
-    } catch {
+    } catch (err) {
+      if (!isDemoModeActive()) throw err
       // Return simulated local data
       await new Promise((r) => setTimeout(r, 200))
       let result = [...mockDocuments]

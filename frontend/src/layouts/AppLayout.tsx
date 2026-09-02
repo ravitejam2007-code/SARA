@@ -1,12 +1,40 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { EnclaveBanner } from '@/components/EnclaveBanner'
+import { useToast } from '@/components/ui/Toast'
 
 export const AppLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    const handleClearanceDenied = (e: Event) => {
+      const custom = e as CustomEvent<{ message: string; endpoint: string }>
+      toast.error('Clearance Denied', custom.detail?.message || 'Access restricted by sovereign policy.')
+    }
+
+    const handleNetworkOffline = (e: Event) => {
+      const custom = e as CustomEvent<{ endpoint: string }>
+      toast.warning('FastAPI Offline', `Endpoint ${custom.detail?.endpoint || ''} unreachable. Operating in SIH demo mode.`)
+    }
+
+    const handleTimeout = () => {
+      toast.error('Enclave Timeout', 'Hardware enclave response exceeded 15,000ms threshold.')
+    }
+
+    window.addEventListener('zenith:clearance_denied', handleClearanceDenied)
+    window.addEventListener('zenith:network_offline', handleNetworkOffline)
+    window.addEventListener('zenith:timeout', handleTimeout)
+
+    return () => {
+      window.removeEventListener('zenith:clearance_denied', handleClearanceDenied)
+      window.removeEventListener('zenith:network_offline', handleNetworkOffline)
+      window.removeEventListener('zenith:timeout', handleTimeout)
+    }
+  }, [toast])
 
   const handleToggleCollapse = () => {
     setCollapsed((prev) => !prev)

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { authApi } from '@/services/authApi'
 import type { UserProfile, UserRole, AuthCredentials } from '@/types'
 
 export interface AuthContextType {
@@ -129,8 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsSessionExpired(false)
 
       try {
-        // Simulate realistic cryptographic handshake delay
-        await new Promise((resolve) => setTimeout(resolve, 600))
+        const authResponse = await authApi.login(credentials)
 
         const input = credentials.username.trim().toLowerCase()
 
@@ -148,18 +148,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           // Dynamic user with Admin role fallback
           matchedUser = {
-            id: `usr-zn-${Date.now().toString(36)}`,
+            id: authResponse.user?.id || `usr-zn-${Date.now().toString(36)}`,
             username: credentials.username,
-            name: credentials.username,
-            email: `${credentials.username}@zenith-industrial.sec`,
+            name: authResponse.user?.name || credentials.username,
+            email: authResponse.user?.email || `${credentials.username}@zenith-industrial.sec`,
             callsign: credentials.username.toUpperCase(),
-            role: 'Admin',
+            role: authResponse.user?.role || 'Admin',
             clearanceLevel: 'LEVEL-4 (TOP SECRET / RESTRICTED)',
-            terminalId: 'NODE-CUSTOM-01',
+            terminalId: 'NODE-FASTAPI-01',
           }
         }
 
-        const generatedToken = `sov_jwt_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
+        const generatedToken = authResponse.token || `sov_jwt_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 
         // Choose storage target based on Remember Me option
         const targetStorage = rememberMe ? localStorage : sessionStorage
