@@ -4,6 +4,7 @@ import { AuthProvider } from '@/context/AuthContext'
 import { EnclaveProvider } from '@/context/EnclaveContext'
 import { ToastProvider } from '@/components/ui/Toast'
 import { AppLayout } from '@/layouts/AppLayout'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
 
 // Page Components
 import { Login } from '@/pages/Login'
@@ -28,18 +29,94 @@ export const App: React.FC = () => {
               {/* Standalone Sovereign Authentication Route */}
               <Route path="/login" element={<Login />} />
 
-              {/* Industrial Workbench Layout Wrapped Routes */}
-              <Route element={<AppLayout />}>
+              {/* Protected Workbench Routes */}
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                {/* Default redirect to Dashboard */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+                {/* All Roles */}
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/assistant" element={<Assistant />} />
-                <Route path="/documents" element={<Documents />} />
-                <Route path="/knowledge-base" element={<KnowledgeBase />} />
-                <Route path="/workflows" element={<Workflows />} />
-                <Route path="/deliverables" element={<Deliverables />} />
-                <Route path="/security" element={<Security />} />
-                <Route path="/audit-logs" element={<AuditLogs />} />
+
+                {/* Engineer, Manager, Admin */}
+                <Route
+                  path="/assistant"
+                  element={
+                    <ProtectedRoute allowedRoles={['Engineer', 'Manager', 'Admin']}>
+                      <Assistant />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* All Roles (Read-only views for Auditor) */}
+                <Route
+                  path="/documents"
+                  element={
+                    <ProtectedRoute allowedRoles={['Engineer', 'Manager', 'Admin', 'Auditor']}>
+                      <Documents />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Engineer, Manager, Admin */}
+                <Route
+                  path="/knowledge-base"
+                  element={
+                    <ProtectedRoute allowedRoles={['Engineer', 'Manager', 'Admin']}>
+                      <KnowledgeBase />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Manager, Admin */}
+                <Route
+                  path="/workflows"
+                  element={
+                    <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+                      <Workflows />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Engineer, Manager, Admin, Auditor */}
+                <Route
+                  path="/deliverables"
+                  element={
+                    <ProtectedRoute allowedRoles={['Engineer', 'Manager', 'Admin', 'Auditor']}>
+                      <Deliverables />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Admin, Auditor */}
+                <Route
+                  path="/security"
+                  element={
+                    <ProtectedRoute allowedRoles={['Admin', 'Auditor']}>
+                      <Security />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Admin, Auditor */}
+                <Route
+                  path="/audit-logs"
+                  element={
+                    <ProtectedRoute allowedRoles={['Admin', 'Auditor']}>
+                      <AuditLogs />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* UI Design System Showcase (All Authenticated Users) */}
                 <Route path="/design-system" element={<ComponentShowcase />} />
+
+                {/* Fallback 404 Route */}
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

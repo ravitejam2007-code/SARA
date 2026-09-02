@@ -48,7 +48,7 @@
 
 @layer utilities {
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-offset-1 focus-visible:ring-offset-bg;
+    @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-offset-1 focus-visible:ring-offset-[#080b12];
   }
 
   .industrial-glass {

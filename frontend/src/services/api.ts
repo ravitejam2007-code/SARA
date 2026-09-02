@@ -33,8 +33,11 @@ export const apiClient: AxiosInstance = axios.create({
 // Request Interceptor: Attach authentication token & cryptographic trace headers
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    // Inject auth token from storage if available
-    const token = typeof window !== 'undefined' ? localStorage.getItem('zenith_auth_token') : null
+    // Inject auth token from storage if available (checks both localStorage and sessionStorage)
+    const token =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('zenith_auth_token') || sessionStorage.getItem('zenith_auth_token')
+        : null
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }

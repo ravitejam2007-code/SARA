@@ -5,6 +5,8 @@
 
 export type EnclaveSecurityState = 'SECURE' | 'DEGRADED' | 'AIR_GAPPED' | 'ISOLATED' | 'MAINTENANCE'
 
+export type UserRole = 'Engineer' | 'Manager' | 'Admin' | 'Auditor'
+
 export interface SovereignEnclaveStatus {
   enclaveId: string
   airGapVerified: boolean
@@ -18,13 +20,19 @@ export interface SovereignEnclaveStatus {
 
 export interface UserProfile {
   id: string
-  callsign: string
+  username: string
   name: string
   email: string
-  role: 'SOVEREIGN_ADMIN' | 'CHIEF_ENGINEER' | 'OPERATIONS_ANALYST' | 'AUDIT_OBSERVER'
-  clearanceLevel: 'LEVEL-4 (TOP SECRET / RESTRICTED)' | 'LEVEL-3 (CONFIDENTIAL)' | 'LEVEL-2 (INTERNAL)'
+  callsign: string
+  role: UserRole
+  clearanceLevel: string
   terminalId: string
-  sessionExpiresAt: string
+  sessionExpiresAt?: string
+}
+
+export interface AuthCredentials {
+  username: string
+  password: string
 }
 
 export interface NavigationItem {
@@ -34,6 +42,7 @@ export interface NavigationItem {
   badge?: string
   badgeVariant?: 'default' | 'emerald' | 'amber' | 'cyan'
   description?: string
+  allowedRoles?: UserRole[]
 }
 
 export interface TelemetryMetric {
