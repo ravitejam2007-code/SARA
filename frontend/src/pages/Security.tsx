@@ -99,17 +99,17 @@ export const Security: React.FC = () => {
   return (
     <div className="space-y-6 font-mono text-text-primary pb-8">
       {/* 1. Page Header */}
-      <div className="rounded-lg bg-surface border border-border p-5 shadow-industrial">
+      <div className="rounded-[12px] bg-white border border-[#ebebeb] p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
-              <ShieldCheck className="w-5 h-5" />
+            <div className="h-8 w-8 rounded-[6px] bg-[#171717] flex items-center justify-center text-white shrink-0 shadow-sm">
+              <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-wider text-text-primary uppercase flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight text-[#171717] flex items-center gap-2">
                 <span>SECURITY, SOVEREIGNTY & AUDIT</span>
               </h1>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-[#8f8f8f]">
                 Confidential Hardware Telemetry • Air-Gap Network Egress • Immutable Cryptographic Audit Log
               </p>
             </div>

@@ -126,9 +126,16 @@ export const Deliverables: React.FC = () => {
   }, [deliverables, searchQuery, dateFilter, sortBy, sortOrder])
 
   // Action: Download
-  const handleDownload = async (doc: DeliverableItem) => {
-    await deliverableApi.downloadDeliverable(doc.id)
-    toast.success('Download Triggered', `Exporting certified artifact ${doc.filename}.`)
+  const handleDownload = (doc: DeliverableItem) => {
+    const url = `http://127.0.0.1:8000/api/deliverables/download/${encodeURIComponent(doc.filename)}`
+    const link = document.createElement('a')
+    link.href = url
+    link.download = doc.filename
+    link.target = '_blank'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success('Download Initialized', `Exporting certified artifact ${doc.filename}`)
   }
 
   // Action: Rename Submit
@@ -186,13 +193,13 @@ export const Deliverables: React.FC = () => {
       case 'XLSX':
         return <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
       case 'PPTX':
-        return <FileText className="w-4 h-4 text-amber-400" />
+        return <FileText className="w-4 h-4 text-amber-700" />
       case 'ZIP':
-        return <Archive className="w-4 h-4 text-purple-400" />
+        return <Archive className="w-4 h-4 text-purple-700" />
       case 'CODE':
-        return <FileCode className="w-4 h-4 text-cyan-400" />
+        return <FileCode className="w-4 h-4 text-[#171717]" />
       default:
-        return <Package className="w-4 h-4 text-text-muted" />
+        return <Package className="w-4 h-4 text-[#8f8f8f]" />
     }
   }
 
@@ -269,14 +276,14 @@ export const Deliverables: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
-                <Package className="w-5 h-5" />
+              <div className="h-8 w-8 rounded-[6px] bg-[#171717] flex items-center justify-center text-white shrink-0 shadow-sm">
+                <Package className="w-4 h-4" />
               </div>
               <div>
-                <h1 className="text-xl font-bold tracking-wider text-text-primary uppercase flex items-center gap-2">
+                <h1 className="text-xl font-semibold tracking-tight text-[#171717] flex items-center gap-2">
                   <span>GENERATED DELIVERABLES & ARTIFACTS</span>
                 </h1>
-                <p className="text-xs text-text-secondary">
+                <p className="text-xs text-[#8f8f8f]">
                   Certified Pipeline Deliverables • Cryptographic Seals • Enterprise File Vault
                 </p>
               </div>
@@ -285,24 +292,24 @@ export const Deliverables: React.FC = () => {
 
           {/* Metric Badges */}
           <div className="flex flex-wrap items-center gap-3">
-            <div className="px-3 py-1.5 rounded bg-surface-sunken border border-border flex items-center gap-2">
-              <span className="text-[10px] text-text-muted uppercase">TOTAL ARTIFACTS:</span>
-              <span className="text-sm font-bold text-text-primary">{totalCount}</span>
+            <div className="px-3 py-1.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] flex items-center gap-2">
+              <span className="text-[10px] text-[#8f8f8f] uppercase font-bold">TOTAL ARTIFACTS:</span>
+              <span className="text-sm font-bold text-[#171717]">{totalCount}</span>
             </div>
 
-            <div className="px-3 py-1.5 rounded bg-surface-sunken border border-emerald-900/50 flex items-center gap-2">
-              <span className="text-[10px] text-emerald-400 uppercase">FIPS VERIFIED:</span>
-              <span className="text-sm font-bold text-emerald-300">{verifiedCount}</span>
+            <div className="px-3 py-1.5 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center gap-2">
+              <span className="text-[10px] text-emerald-800 uppercase font-bold">FIPS VERIFIED:</span>
+              <span className="text-sm font-bold text-emerald-700">{verifiedCount}</span>
             </div>
 
-            <div className="px-3 py-1.5 rounded bg-surface-sunken border border-amber-900/50 flex items-center gap-2">
-              <span className="text-[10px] text-amber-400 uppercase">PENDING REVIEW:</span>
-              <span className="text-sm font-bold text-amber-300">{pendingCount}</span>
+            <div className="px-3 py-1.5 rounded-[6px] bg-amber-50 border border-amber-200 flex items-center gap-2">
+              <span className="text-[10px] text-amber-800 uppercase font-bold">PENDING REVIEW:</span>
+              <span className="text-sm font-bold text-amber-700">{pendingCount}</span>
             </div>
 
-            <div className="px-3 py-1.5 rounded bg-surface-sunken border border-cyan-900/50 flex items-center gap-2">
-              <span className="text-[10px] text-cyan-400 uppercase">STORAGE:</span>
-              <span className="text-sm font-bold text-cyan-300">{totalMb} MB</span>
+            <div className="px-3 py-1.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] flex items-center gap-2">
+              <span className="text-[10px] text-[#8f8f8f] uppercase font-bold">STORAGE:</span>
+              <span className="text-sm font-bold text-[#171717]">{totalMb} MB</span>
             </div>
 
             <Button
@@ -389,16 +396,16 @@ export const Deliverables: React.FC = () => {
 
           {/* Date Range Quick Pills */}
           <div className="flex items-center gap-1 text-[11px]">
-            <span className="mr-1 uppercase font-semibold">DATE:</span>
+            <span className="mr-1 uppercase font-semibold text-[#8f8f8f]">DATE:</span>
             {(['ALL', '24H', '7D', '30D'] as const).map((d) => (
               <button
                 key={d}
                 type="button"
                 onClick={() => setDateFilter(d)}
-                className={`px-2 py-0.5 rounded border transition-colors ${
+                className={`px-2 py-0.5 rounded-[4px] border transition-colors ${
                   dateFilter === d
-                    ? 'bg-cyan-950/80 border-cyan-500 text-cyan-300 font-bold'
-                    : 'bg-surface-sunken border-border text-text-muted hover:text-text-primary'
+                    ? 'bg-[#171717] border-[#171717] text-white font-bold'
+                    : 'bg-[#fafafa] border-[#ebebeb] text-[#8f8f8f] hover:text-[#171717]'
                 }`}
               >
                 {d === 'ALL' ? 'ALL TIME' : d}
@@ -436,10 +443,10 @@ export const Deliverables: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-border text-text-secondary text-[11px] bg-surface-sunken">
+                <tr className="border-b border-[#ebebeb] text-[#8f8f8f] text-[11px] bg-[#fafafa]">
                   {/* Col 1: Filename */}
                   <th
-                    className="py-3 px-4 cursor-pointer hover:text-cyan-300 transition-colors"
+                    className="py-3 px-4 cursor-pointer hover:text-[#171717] transition-colors"
                     onClick={() => {
                       if (sortBy === 'filename') setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
                       else {
@@ -465,7 +472,7 @@ export const Deliverables: React.FC = () => {
 
                   {/* Col 5: Created Date */}
                   <th
-                    className="py-3 px-3 cursor-pointer hover:text-cyan-300 transition-colors"
+                    className="py-3 px-3 cursor-pointer hover:text-[#171717] transition-colors"
                     onClick={() => {
                       if (sortBy === 'createdDate') setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
                       else {
@@ -482,7 +489,7 @@ export const Deliverables: React.FC = () => {
 
                   {/* Col 6: Size */}
                   <th
-                    className="py-3 px-3 cursor-pointer hover:text-cyan-300 transition-colors"
+                    className="py-3 px-3 cursor-pointer hover:text-[#171717] transition-colors"
                     onClick={() => {
                       if (sortBy === 'sizeBytes') setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
                       else {
@@ -505,27 +512,27 @@ export const Deliverables: React.FC = () => {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-border/60">
+              <tbody className="divide-y divide-[#ebebeb]">
                 {filteredDeliverables.map((doc) => (
                   <tr
                     key={doc.id}
-                    className="hover:bg-surface-elevated/70 transition-colors group"
+                    className="hover:bg-[#fafafa] transition-colors group"
                   >
                     {/* Col 1: Filename */}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-1.5 rounded bg-surface-sunken border border-border shrink-0">
+                        <div className="p-1.5 rounded bg-[#fafafa] border border-[#ebebeb] shrink-0">
                           {getTypeIcon(doc.fileType)}
                         </div>
                         <div className="min-w-0">
                           <button
                             type="button"
                             onClick={() => setPreviewDoc(doc)}
-                            className="font-semibold text-text-primary text-left truncate group-hover:text-cyan-300 transition-colors block cursor-pointer"
+                            className="font-semibold text-[#171717] text-left truncate group-hover:text-[#0070f3] transition-colors block cursor-pointer"
                           >
                             {doc.filename}
                           </button>
-                          <span className="text-[10px] text-text-muted font-mono block">
+                          <span className="text-[10px] text-[#8f8f8f] font-mono block">
                             SHA: {doc.checksumSha256.slice(0, 16)}...
                           </span>
                         </div>
@@ -544,21 +551,21 @@ export const Deliverables: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => navigate('/workflows')}
-                        className="px-2 py-0.5 rounded bg-surface-sunken border border-border text-[11px] text-text-secondary hover:text-cyan-300 hover:border-cyan-500/40 transition-colors flex items-center gap-1 cursor-pointer"
+                        className="px-2 py-0.5 rounded bg-[#fafafa] border border-[#ebebeb] text-[11px] text-[#4d4d4d] hover:text-[#171717] hover:border-[#171717] transition-colors flex items-center gap-1 cursor-pointer"
                         title="View Workflow Definition"
                       >
-                        <GitBranch className="w-3 h-3 text-cyan-400 shrink-0" />
+                        <GitBranch className="w-3 h-3 text-[#171717] shrink-0" />
                         <span className="truncate max-w-[150px]">{doc.workflow}</span>
                       </button>
                     </td>
 
                     {/* Col 4: Generated By */}
-                    <td className="py-3 px-3 text-text-secondary whitespace-nowrap">
+                    <td className="py-3 px-3 text-[#4d4d4d] whitespace-nowrap">
                       {doc.generatedBy}
                     </td>
 
                     {/* Col 5: Created Date */}
-                    <td className="py-3 px-3 text-text-muted whitespace-nowrap">
+                    <td className="py-3 px-3 text-[#8f8f8f] whitespace-nowrap">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {doc.createdDate}
@@ -566,7 +573,7 @@ export const Deliverables: React.FC = () => {
                     </td>
 
                     {/* Col 6: Size */}
-                    <td className="py-3 px-3 text-text-secondary whitespace-nowrap">
+                    <td className="py-3 px-3 text-[#4d4d4d] font-mono whitespace-nowrap">
                       {doc.formattedSize}
                     </td>
 
@@ -577,12 +584,12 @@ export const Deliverables: React.FC = () => {
 
                     {/* Col 8: Row Actions */}
                     <td className="py-3 px-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-end gap-1.5">
                         {/* Action: Preview */}
                         <button
                           type="button"
                           onClick={() => setPreviewDoc(doc)}
-                          className="p-1.5 rounded text-text-muted hover:text-cyan-400 hover:bg-surface-sunken transition-colors focus-ring cursor-pointer"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                           title="Preview Deliverable"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -592,7 +599,7 @@ export const Deliverables: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleDownload(doc)}
-                          className="p-1.5 rounded text-text-muted hover:text-emerald-400 hover:bg-surface-sunken transition-colors focus-ring cursor-pointer"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-emerald-700 hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                           title="Download Certified Artifact"
                         >
                           <Download className="w-3.5 h-3.5" />
@@ -605,7 +612,7 @@ export const Deliverables: React.FC = () => {
                             setRenameDoc(doc)
                             setNewFilename(doc.filename)
                           }}
-                          className="p-1.5 rounded text-text-muted hover:text-amber-400 hover:bg-surface-sunken transition-colors focus-ring cursor-pointer"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-amber-700 hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                           title="Rename Deliverable"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -615,7 +622,7 @@ export const Deliverables: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenAuditTrail(doc)}
-                          className="p-1.5 rounded text-text-muted hover:text-purple-400 hover:bg-surface-sunken transition-colors focus-ring cursor-pointer"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-purple-700 hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                           title="View Cryptographic Audit Trail"
                         >
                           <ScrollText className="w-3.5 h-3.5" />
@@ -625,7 +632,7 @@ export const Deliverables: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => navigate('/workflows')}
-                          className="p-1.5 rounded text-text-muted hover:text-cyan-300 hover:bg-surface-sunken transition-colors focus-ring cursor-pointer"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                           title="View Originating Workflow"
                         >
                           <GitBranch className="w-3.5 h-3.5" />
@@ -635,7 +642,7 @@ export const Deliverables: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setDocToDelete(doc)}
-                          className="p-1.5 rounded text-text-muted hover:text-rose-400 hover:bg-surface-sunken transition-colors focus-ring cursor-pointer"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-[#ee0000] hover:bg-red-50 transition-colors focus-ring cursor-pointer"
                           title="Delete Deliverable"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -662,13 +669,13 @@ export const Deliverables: React.FC = () => {
           <ModalBody className="space-y-4">
             {/* Metadata Tags */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2.5 rounded bg-surface-sunken border border-border">
-                <span className="text-[10px] text-text-muted block uppercase">FORMAT</span>
-                <span className="font-bold text-cyan-300">{previewDoc.fileType}</span>
+              <div className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb]">
+                <span className="text-[10px] text-[#8f8f8f] block uppercase">FORMAT</span>
+                <span className="font-bold text-[#171717]">{previewDoc.fileType}</span>
               </div>
-              <div className="p-2.5 rounded bg-surface-sunken border border-border">
-                <span className="text-[10px] text-text-muted block uppercase">SIZE</span>
-                <span className="font-bold text-text-primary">{previewDoc.formattedSize}</span>
+              <div className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb]">
+                <span className="text-[10px] text-[#8f8f8f] block uppercase">SIZE</span>
+                <span className="font-bold text-[#171717]">{previewDoc.formattedSize}</span>
               </div>
               <div className="p-2.5 rounded bg-surface-sunken border border-border">
                 <span className="text-[10px] text-text-muted block uppercase">AUTHOR</span>
@@ -704,17 +711,17 @@ export const Deliverables: React.FC = () => {
                   )}
                 </button>
               </div>
-              <pre className="text-[11px] text-cyan-300 font-mono break-all selection:bg-cyan-500 selection:text-black">
+              <pre className="text-[11px] text-[#171717] font-mono break-all font-semibold">
                 {previewDoc.checksumSha256}
               </pre>
             </div>
 
             {/* Content Preview */}
             <div className="space-y-1 text-xs">
-              <span className="text-[10px] text-text-muted uppercase font-semibold">
+              <span className="text-[10px] text-[#8f8f8f] uppercase font-semibold">
                 Artifact Content Stream:
               </span>
-              <pre className="p-4 rounded bg-[#050811] border border-border text-text-primary leading-relaxed whitespace-pre-wrap font-mono text-[11px] max-h-64 overflow-y-auto selection:bg-cyan-500 selection:text-black">
+              <pre className="p-4 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] text-[#171717] leading-relaxed whitespace-pre-wrap font-mono text-[11px] max-h-64 overflow-y-auto selection:bg-[#171717] selection:text-white">
                 {previewDoc.previewContent || 'Binary artifact payload stored in enclave buffer.'}
               </pre>
             </div>
@@ -794,13 +801,13 @@ export const Deliverables: React.FC = () => {
                 <span className="text-text-muted">GENERATED BY:</span>
                 <span className="text-text-secondary">{auditTrail.actor}</span>
               </div>
-              <div className="flex justify-between border-b border-border/60 pb-1.5">
-                <span className="text-text-muted">ENCLAVE HOST:</span>
-                <span className="text-cyan-400 font-bold">{auditTrail.enclaveId}</span>
+              <div className="flex justify-between border-b border-[#ebebeb] pb-1.5">
+                <span className="text-[#8f8f8f]">ENCLAVE HOST:</span>
+                <span className="text-[#171717] font-bold">{auditTrail.enclaveId}</span>
               </div>
-              <div className="flex justify-between border-b border-border/60 pb-1.5">
-                <span className="text-text-muted">HSM CERTIFICATE:</span>
-                <span className="text-emerald-300 font-mono text-[10px]">{auditTrail.hsmSignature}</span>
+              <div className="flex justify-between border-b border-[#ebebeb] pb-1.5">
+                <span className="text-[#8f8f8f]">HSM CERTIFICATE:</span>
+                <span className="text-emerald-700 font-mono text-[10px] font-medium">{auditTrail.hsmSignature}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-muted">POLICY REGIME:</span>
@@ -809,10 +816,10 @@ export const Deliverables: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <span className="text-[10px] text-text-muted uppercase font-semibold">
+              <span className="text-[10px] text-[#8f8f8f] uppercase font-semibold font-mono">
                 SEALED SHA-256 CHECKSUM:
               </span>
-              <pre className="p-2.5 rounded bg-[#050811] border border-border text-cyan-300 font-mono text-[11px] break-all">
+              <pre className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] text-[#171717] font-mono text-[11px] break-all font-semibold">
                 {auditTrail.checksumSha256}
               </pre>
             </div>

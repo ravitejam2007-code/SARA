@@ -239,12 +239,12 @@ export const Documents: React.FC = () => {
         return <FileText className="w-4 h-4 text-amber-400" />
       case 'PNG':
       case 'JPG':
-        return <ImageIcon className="w-4 h-4 text-purple-400" />
+        return <ImageIcon className="w-4 h-4 text-purple-700" />
       case 'TXT':
       case 'CSV':
-        return <FileCode className="w-4 h-4 text-cyan-400" />
+        return <FileCode className="w-4 h-4 text-[#171717]" />
       default:
-        return <FileText className="w-4 h-4 text-text-muted" />
+        return <FileText className="w-4 h-4 text-[#8f8f8f]" />
     }
   }
 
@@ -290,17 +290,17 @@ export const Documents: React.FC = () => {
   return (
     <div className="space-y-6 font-mono text-text-primary pb-8">
       {/* 1. Header & State Simulator Bar */}
-      <div className="rounded-lg bg-surface border border-border p-5 shadow-industrial">
+      <div className="rounded-[12px] bg-white border border-[#ebebeb] p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
-              <FileText className="w-5 h-5" />
+            <div className="h-8 w-8 rounded-[6px] bg-[#171717] flex items-center justify-center text-white shrink-0 shadow-sm">
+              <FileText className="w-4 h-4" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-wider text-text-primary uppercase flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight text-[#171717] flex items-center gap-2">
                 <span>DOCUMENT MANAGEMENT & INGESTION</span>
               </h1>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-[#8f8f8f]">
                 Sovereign File Vault • Multi-Format Ingestion Pipeline • On-Premise Parser
               </p>
             </div>
@@ -337,10 +337,10 @@ export const Documents: React.FC = () => {
               <button
                 key={mode}
                 onClick={() => setSimulatedState(mode)}
-                className={`px-2 py-0.5 rounded border uppercase font-medium transition-colors ${
+                className={`px-2 py-0.5 rounded border uppercase font-medium transition-colors cursor-pointer ${
                   simulatedState === mode
-                    ? 'bg-cyan-950/80 border-cyan-500 text-cyan-300'
-                    : 'bg-surface-sunken border-border text-text-muted hover:text-text-primary'
+                    ? 'bg-[#171717] border-[#171717] text-white'
+                    : 'bg-[#fafafa] border-[#ebebeb] text-[#8f8f8f] hover:text-[#171717]'
                 }`}
               >
                 {mode}
@@ -366,10 +366,10 @@ export const Documents: React.FC = () => {
 
       {/* 2. Drag & Drop Upload Zone (Supports all 8 formats) */}
       <div
-        className={`rounded-lg border-2 border-dashed transition-all p-6 text-center relative overflow-hidden ${
+        className={`rounded-[10px] border border-dashed transition-all p-6 text-center relative overflow-hidden ${
           isDraggingOver
-            ? 'border-cyan-400 bg-cyan-950/40'
-            : 'border-border bg-surface hover:border-cyan-500/50'
+            ? 'border-[#171717] bg-[#f5f5f5]'
+            : 'border-[#ebebeb] bg-white hover:border-[#171717]'
         }`}
         onDragOver={(e) => {
           e.preventDefault()
@@ -392,15 +392,15 @@ export const Documents: React.FC = () => {
         />
 
         <div className="max-w-xl mx-auto space-y-3">
-          <div className="inline-flex p-3 rounded-full bg-surface-elevated border border-border text-cyan-400">
-            <Upload className="w-6 h-6" />
+          <div className="inline-flex p-3 rounded-full bg-[#fafafa] border border-[#ebebeb] text-[#171717]">
+            <Upload className="w-5 h-5" />
           </div>
 
-          <div className="space-y-1">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-text-primary">
+          <div className="space-y-1 font-sans">
+            <h3 className="text-sm font-semibold tracking-tight text-[#171717] uppercase">
               DRAG & DROP FILES OR CLICK TO UPLOAD
             </h3>
-            <p className="text-xs text-text-secondary">
+            <p className="text-xs text-[#8f8f8f]">
               Files are streamed directly to sovereign hardware enclaves for automated extraction.
             </p>
           </div>
@@ -410,12 +410,12 @@ export const Documents: React.FC = () => {
             {['PDF', 'DOCX', 'XLSX', 'PPTX', 'PNG', 'JPG', 'TXT', 'CSV'].map((ext) => (
               <span
                 key={ext}
-                className="px-2 py-0.5 rounded bg-surface-sunken border border-border text-cyan-300 font-semibold"
+                className="px-2 py-0.5 rounded bg-[#fafafa] border border-[#ebebeb] text-[#171717] font-medium"
               >
                 .{ext}
               </span>
             ))}
-            <span className="text-text-muted ml-1">MAX: 100MB</span>
+            <span className="text-[#8f8f8f] ml-1">MAX: 100MB</span>
           </div>
 
           <div>
@@ -432,7 +432,7 @@ export const Documents: React.FC = () => {
           {/* Upload Progress Bar */}
           {uploadProgress !== null && (
             <div className="max-w-md mx-auto pt-2 space-y-1 text-left">
-              <div className="flex justify-between text-[11px] text-cyan-300">
+              <div className="flex justify-between text-[11px] text-[#171717]">
                 <span>Streaming binary to sovereign buffer...</span>
                 <span>{uploadProgress}%</span>
               </div>
@@ -515,15 +515,15 @@ export const Documents: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <ArrowUpDown className="w-3 h-3 text-cyan-400" />
-              SORTED BY: <strong className="text-cyan-300 uppercase">{sortBy} ({sortOrder})</strong>
+              <ArrowUpDown className="w-3 h-3 text-[#171717]" />
+              SORTED BY: <strong className="text-[#171717] uppercase">{sortBy} ({sortOrder})</strong>
             </span>
           </div>
         </div>
       </div>
 
       {/* 4. Document Data Table (8 Columns) */}
-      <div className="rounded-lg bg-surface border border-border shadow-industrial overflow-hidden">
+      <div className="rounded-[10px] bg-white border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-hidden">
         {isLoading ? (
           <div className="p-6 space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -554,10 +554,10 @@ export const Documents: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-border text-text-secondary text-[11px] bg-surface-sunken">
+                <tr className="border-b border-[#ebebeb] text-[#8f8f8f] text-[11px] bg-[#fafafa]">
                   {/* Col 1: Name */}
                   <th
-                    className="py-3 px-4 cursor-pointer hover:text-cyan-300 transition-colors"
+                    className="py-3 px-4 cursor-pointer hover:text-[#171717] transition-colors"
                     onClick={() => {
                       if (sortBy === 'name') setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
                       else {
@@ -577,7 +577,7 @@ export const Documents: React.FC = () => {
 
                   {/* Col 3: Size */}
                   <th
-                    className="py-3 px-3 cursor-pointer hover:text-cyan-300 transition-colors"
+                    className="py-3 px-3 cursor-pointer hover:text-[#171717] transition-colors"
                     onClick={() => {
                       if (sortBy === 'sizeBytes') setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
                       else {
@@ -597,7 +597,7 @@ export const Documents: React.FC = () => {
 
                   {/* Col 5: Date */}
                   <th
-                    className="py-3 px-3 cursor-pointer hover:text-cyan-300 transition-colors"
+                    className="py-3 px-3 cursor-pointer hover:text-[#171717] transition-colors"
                     onClick={() => {
                       if (sortBy === 'uploadedAt') setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
                       else {
@@ -623,23 +623,23 @@ export const Documents: React.FC = () => {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-border/60">
+              <tbody className="divide-y divide-[#ebebeb]">
                 {filteredDocuments.map((doc) => (
                   <tr
                     key={doc.id}
-                    className="hover:bg-surface-elevated/70 transition-colors group"
+                    className="hover:bg-[#fafafa] transition-colors group"
                   >
                     {/* Col 1: Name & SHA-256 preview */}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-1.5 rounded bg-surface-sunken border border-border shrink-0">
+                        <div className="p-1.5 rounded bg-[#fafafa] border border-[#ebebeb] shrink-0">
                           {getFormatIcon(doc.type)}
                         </div>
                         <div className="min-w-0">
-                          <span className="font-semibold text-text-primary block truncate group-hover:text-cyan-300 transition-colors">
+                          <span className="font-semibold text-[#171717] block truncate group-hover:text-[#0070f3] transition-colors cursor-pointer" onClick={() => setViewingDoc(doc)}>
                             {doc.name}
                           </span>
-                          <span className="text-[10px] text-text-muted font-mono block truncate">
+                          <span className="text-[10px] text-[#8f8f8f] font-mono block truncate">
                             SHA: {doc.checksumSha256.slice(0, 16)}...
                           </span>
                         </div>
@@ -724,7 +724,7 @@ export const Documents: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setViewingDoc(doc)}
-                          className="p-1.5 rounded text-text-muted hover:text-cyan-400 hover:bg-surface-sunken transition-colors focus-ring"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                           title="View Document Metadata & Extracted Text"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -734,7 +734,7 @@ export const Documents: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleDownloadDoc(doc)}
-                          className="p-1.5 rounded text-text-muted hover:text-emerald-400 hover:bg-surface-sunken transition-colors focus-ring"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-emerald-700 hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                           title="Download Document"
                         >
                           <Download className="w-3.5 h-3.5" />
@@ -745,7 +745,7 @@ export const Documents: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleProcessDoc(doc.id)}
-                            className="p-1.5 rounded text-text-muted hover:text-amber-400 hover:bg-surface-sunken transition-colors focus-ring"
+                            className="p-1.5 rounded text-[#8f8f8f] hover:text-amber-700 hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                             title="Trigger Asynchronous Backend Processing"
                           >
                             <Cpu className="w-3.5 h-3.5" />
@@ -757,7 +757,7 @@ export const Documents: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleAddToKnowledgeBase(doc.id)}
-                            className="p-1.5 rounded text-text-muted hover:text-cyan-300 hover:bg-surface-sunken transition-colors focus-ring"
+                            className="p-1.5 rounded text-[#8f8f8f] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors focus-ring cursor-pointer"
                             title="Embed into Sovereign Knowledge Base"
                           >
                             <Database className="w-3.5 h-3.5" />
@@ -768,7 +768,7 @@ export const Documents: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setDocToDelete(doc)}
-                          className="p-1.5 rounded text-text-muted hover:text-rose-400 hover:bg-surface-sunken transition-colors focus-ring"
+                          className="p-1.5 rounded text-[#8f8f8f] hover:text-[#ee0000] hover:bg-red-50 transition-colors focus-ring cursor-pointer"
                           title="Delete Document"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -795,39 +795,39 @@ export const Documents: React.FC = () => {
           <ModalBody className="space-y-4">
             {/* Header Specs */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2.5 rounded bg-surface-sunken border border-border">
-                <span className="text-[10px] text-text-muted block uppercase">FORMAT</span>
-                <span className="font-bold text-cyan-300">{viewingDoc.type}</span>
+              <div className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb]">
+                <span className="text-[10px] text-[#8f8f8f] block uppercase">FORMAT</span>
+                <span className="font-bold text-[#171717]">{viewingDoc.type}</span>
               </div>
-              <div className="p-2.5 rounded bg-surface-sunken border border-border">
-                <span className="text-[10px] text-text-muted block uppercase">SIZE</span>
-                <span className="font-bold text-text-primary">{viewingDoc.formattedSize}</span>
+              <div className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb]">
+                <span className="text-[10px] text-[#8f8f8f] block uppercase">SIZE</span>
+                <span className="font-bold text-[#171717]">{viewingDoc.formattedSize}</span>
               </div>
-              <div className="p-2.5 rounded bg-surface-sunken border border-border">
-                <span className="text-[10px] text-text-muted block uppercase">PROCESSING</span>
-                <span className="font-bold text-emerald-400">{viewingDoc.processingStatus}</span>
+              <div className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb]">
+                <span className="text-[10px] text-[#8f8f8f] block uppercase">PROCESSING</span>
+                <span className="font-bold text-emerald-700">{viewingDoc.processingStatus}</span>
               </div>
-              <div className="p-2.5 rounded bg-surface-sunken border border-border">
-                <span className="text-[10px] text-text-muted block uppercase">INDEX STATUS</span>
-                <span className="font-bold text-cyan-400">{viewingDoc.indexedStatus}</span>
+              <div className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb]">
+                <span className="text-[10px] text-[#8f8f8f] block uppercase">INDEX STATUS</span>
+                <span className="font-bold text-[#171717]">{viewingDoc.indexedStatus}</span>
               </div>
             </div>
 
             {/* SHA-256 Checksum Card */}
-            <div className="p-3 rounded bg-surface-sunken border border-border space-y-1">
-              <div className="flex items-center justify-between text-[11px] text-text-muted">
-                <span className="flex items-center gap-1.5 uppercase font-semibold text-emerald-400">
-                  <ShieldCheck className="w-3.5 h-3.5" /> SHA-256 Cryptographic Hash
+            <div className="p-3 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] space-y-1">
+              <div className="flex items-center justify-between text-[11px] text-[#8f8f8f]">
+                <span className="flex items-center gap-1.5 uppercase font-semibold text-emerald-700">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> SHA-256 Cryptographic Hash
                 </span>
                 <button
                   type="button"
                   onClick={() => handleCopyHash(viewingDoc.checksumSha256)}
-                  className="flex items-center gap-1 hover:text-text-primary transition-colors cursor-pointer"
+                  className="flex items-center gap-1 hover:text-[#171717] transition-colors cursor-pointer"
                 >
                   {copiedHash ? (
                     <>
-                      <Check className="w-3 h-3 text-emerald-400" />
-                      <span className="text-emerald-400">Copied</span>
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      <span className="text-emerald-700">Copied</span>
                     </>
                   ) : (
                     <>
@@ -837,7 +837,7 @@ export const Documents: React.FC = () => {
                   )}
                 </button>
               </div>
-              <pre className="text-[11px] text-cyan-300 font-mono break-all selection:bg-cyan-500 selection:text-black">
+              <pre className="text-[11px] text-[#171717] font-mono break-all font-semibold">
                 {viewingDoc.checksumSha256}
               </pre>
             </div>

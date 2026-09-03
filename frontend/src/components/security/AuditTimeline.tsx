@@ -1,66 +1,20 @@
-import React, { useState, useMemo } from 'react'
-import {
-  ScrollText,
-  Search,
-  ChevronDown,
-  ChevronUp,
-  Copy,
-  Check,
-} from 'lucide-react'
+import React, { useState } from 'react'
+import { ScrollText, Search, ChevronDown, ChevronUp, Copy, Check } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import type { AuditTimelineEntry, AuditStatus } from '@/types/security'
+import type { AuditTimelineEntry } from '@/types/security'
 
 export interface AuditTimelineProps {
   entries: AuditTimelineEntry[]
+  isLoading?: boolean
 }
 
 export const AuditTimeline: React.FC<AuditTimelineProps> = ({ entries }) => {
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('ALL')
+  const [statusFilter, setStatusFilter] = useState('ALL')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [copiedHash, setCopiedHash] = useState<string | null>(null)
-
-  const filteredEntries = useMemo(() => {
-    return entries.filter((item) => {
-      if (statusFilter !== 'ALL' && item.status !== statusFilter) return false
-      if (search.trim()) {
-        const q = search.toLowerCase()
-        return (
-          item.user.toLowerCase().includes(q) ||
-          item.action.toLowerCase().includes(q) ||
-          item.resource.toLowerCase().includes(q) ||
-          item.model.toLowerCase().includes(q) ||
-          item.tool.toLowerCase().includes(q)
-        )
-      }
-      return true
-    })
-  }, [entries, search, statusFilter])
-
-  const getStatusBadge = (status: AuditStatus) => {
-    switch (status) {
-      case 'CONFIRMED':
-        return (
-          <Badge variant="success" size="sm">
-            CONFIRMED
-          </Badge>
-        )
-      case 'BLOCKED':
-        return (
-          <Badge variant="error" size="sm">
-            BLOCKED
-          </Badge>
-        )
-      case 'FLAGGED':
-        return (
-          <Badge variant="warning" size="sm">
-            FLAGGED
-          </Badge>
-        )
-    }
-  }
 
   const handleCopyHash = (hash: string) => {
     navigator.clipboard.writeText(hash)
@@ -68,16 +22,59 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({ entries }) => {
     setTimeout(() => setCopiedHash(null), 2000)
   }
 
+  const filteredEntries = entries.filter((item) => {
+    const matchesSearch =
+      !search ||
+      item.user.toLowerCase().includes(search.toLowerCase()) ||
+      item.action.toLowerCase().includes(search.toLowerCase()) ||
+      item.resource.toLowerCase().includes(search.toLowerCase()) ||
+      item.model.toLowerCase().includes(search.toLowerCase())
+
+    const matchesStatus =
+      statusFilter === 'ALL' || item.status.toUpperCase() === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
+
+  const getStatusBadge = (status: string) => {
+    switch (status.toUpperCase()) {
+      case 'CONFIRMED':
+        return (
+          <Badge variant="success" size="sm" dot>
+            CONFIRMED
+          </Badge>
+        )
+      case 'BLOCKED':
+        return (
+          <Badge variant="error" size="sm" dot>
+            BLOCKED
+          </Badge>
+        )
+      case 'FLAGGED':
+        return (
+          <Badge variant="warning" size="sm" dot>
+            FLAGGED
+          </Badge>
+        )
+      default:
+        return (
+          <Badge variant="default" size="sm">
+            {status}
+          </Badge>
+        )
+    }
+  }
+
   return (
-    <div className="rounded-lg bg-surface border border-border shadow-industrial overflow-hidden font-mono space-y-3 p-4">
+    <div className="rounded-[10px] bg-white border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)] overflow-hidden font-sans space-y-3 p-4">
       {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-border/80 pb-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#ebebeb] pb-3">
         <div>
-          <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider flex items-center gap-2">
-            <ScrollText className="w-4 h-4 text-cyan-400" />
+          <h3 className="text-xs font-semibold text-[#171717] uppercase tracking-wider flex items-center gap-2 font-mono">
+            <ScrollText className="w-4 h-4 text-[#171717]" />
             CRYPTOGRAPHIC AUDIT TIMELINE (IMMUTABLE ACTIONS)
           </h3>
-          <p className="text-[11px] text-text-secondary mt-0.5">
+          <p className="text-[11px] text-[#4d4d4d] mt-0.5">
             Cryptographically sealed timeline of operator requests, model invocations, and tool executions.
           </p>
         </div>
@@ -115,7 +112,7 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({ entries }) => {
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-border text-text-secondary text-[11px] bg-surface-sunken">
+            <tr className="border-b border-[#ebebeb] text-[#8f8f8f] text-[11px] bg-[#fafafa]">
               <th className="py-2.5 px-3">TIMESTAMP</th>
               <th className="py-2.5 px-3">USER / CALLSIGN</th>
               <th className="py-2.5 px-3">ACTION</th>
@@ -126,37 +123,37 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({ entries }) => {
               <th className="py-2.5 px-3 text-right">DETAILS</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border/60">
+          <tbody className="divide-y divide-[#ebebeb]">
             {filteredEntries.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-6 text-center text-text-muted text-xs">
+                <td colSpan={8} className="py-6 text-center text-[#8f8f8f] text-xs">
                   No audit log records match the search filter.
                 </td>
               </tr>
             ) : (
               filteredEntries.map((item) => (
                 <React.Fragment key={item.id}>
-                  <tr className="hover:bg-surface-elevated/60 transition-colors">
-                    <td className="py-3 px-3 text-text-muted whitespace-nowrap">
+                  <tr className="hover:bg-[#fafafa] transition-colors">
+                    <td className="py-3 px-3 text-[#8f8f8f] whitespace-nowrap font-mono">
                       {item.timestamp}
                     </td>
-                    <td className="py-3 px-3 font-semibold text-text-primary whitespace-nowrap">
+                    <td className="py-3 px-3 font-semibold text-[#171717] whitespace-nowrap">
                       {item.user}
                     </td>
                     <td className="py-3 px-3">
-                      <span className="px-1.5 py-0.5 rounded bg-surface-sunken border border-border text-[10px] text-cyan-300 font-bold">
+                      <span className="px-1.5 py-0.5 rounded-[4px] bg-[#fafafa] border border-[#ebebeb] text-[10px] text-[#171717] font-semibold font-mono">
                         {item.action}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-text-secondary">
+                    <td className="py-3 px-3 text-[#4d4d4d]">
                       <span className="truncate max-w-[140px] block" title={item.resource}>
                         {item.resource}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-text-muted whitespace-nowrap text-[11px]">
+                    <td className="py-3 px-3 text-[#8f8f8f] whitespace-nowrap text-[11px] font-mono">
                       {item.model}
                     </td>
-                    <td className="py-3 px-3 text-text-secondary whitespace-nowrap text-[11px]">
+                    <td className="py-3 px-3 text-[#4d4d4d] whitespace-nowrap text-[11px] font-mono">
                       {item.tool}
                     </td>
                     <td className="py-3 px-3 whitespace-nowrap">
@@ -167,7 +164,7 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({ entries }) => {
                         <button
                           type="button"
                           onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                          className="p-1 rounded text-text-muted hover:text-cyan-400 hover:bg-surface-sunken transition-colors cursor-pointer"
+                          className="p-1 rounded text-[#8f8f8f] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors cursor-pointer"
                           title="View SHA-256 Checksum"
                         >
                           {expandedId === item.id ? (
@@ -177,21 +174,21 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({ entries }) => {
                           )}
                         </button>
                       ) : (
-                        <span className="text-text-muted">—</span>
+                        <span className="text-[#8f8f8f]">—</span>
                       )}
                     </td>
                   </tr>
 
                   {/* Expandable Checksum Row */}
                   {expandedId === item.id && item.checksumSha256 && (
-                    <tr className="bg-surface-sunken/80 border-b border-border/60">
+                    <tr className="bg-[#fafafa] border-b border-[#ebebeb]">
                       <td colSpan={8} className="py-2.5 px-4">
                         <div className="flex items-center justify-between gap-3 text-[11px]">
                           <div className="flex items-center gap-2">
-                            <span className="text-text-muted uppercase font-semibold">
+                            <span className="text-[#8f8f8f] uppercase font-semibold font-mono">
                               IMMUTABLE SHA-256 SEAL:
                             </span>
-                            <pre className="text-cyan-300 font-mono text-[10px]">
+                            <pre className="text-[#171717] font-mono text-[10px] font-semibold">
                               {item.checksumSha256}
                             </pre>
                           </div>
@@ -199,12 +196,12 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({ entries }) => {
                           <button
                             type="button"
                             onClick={() => handleCopyHash(item.checksumSha256!)}
-                            className="flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300 cursor-pointer"
+                            className="flex items-center gap-1 text-[10px] text-[#0070f3] hover:underline cursor-pointer font-mono"
                           >
                             {copiedHash === item.checksumSha256 ? (
                               <>
-                                <Check className="w-3 h-3 text-emerald-400" />
-                                <span className="text-emerald-400">Copied</span>
+                                <Check className="w-3 h-3 text-emerald-700" />
+                                <span className="text-emerald-700 font-medium">Copied</span>
                               </>
                             ) : (
                               <>

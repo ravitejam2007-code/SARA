@@ -26,41 +26,40 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const variantStyles: Record<string, string> = {
-    default: 'bg-surface-elevated text-text-secondary border-border',
-    info: 'bg-industrial-info-subtle text-cyan-300 border-industrial-info-border',
-    success: 'bg-industrial-success-subtle text-emerald-300 border-industrial-success-border',
-    warning: 'bg-industrial-warning-subtle text-amber-300 border-industrial-warning-border',
-    error: 'bg-industrial-error-subtle text-rose-300 border-industrial-error-border',
-    outline: 'bg-transparent text-text-secondary border-border',
-    // Aliases for backward compatibility
-    cyan: 'bg-industrial-info-subtle text-cyan-300 border-industrial-info-border',
-    emerald: 'bg-industrial-success-subtle text-emerald-300 border-industrial-success-border',
-    amber: 'bg-industrial-warning-subtle text-amber-300 border-industrial-warning-border',
-    crimson: 'bg-industrial-error-subtle text-rose-300 border-industrial-error-border',
+    default: 'bg-[#fafafa] text-[#171717] border-[#ebebeb]',
+    info: 'bg-[#f0f7ff] text-[#0070f3] border-[#d3e5ff]',
+    success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    warning: 'bg-amber-50 text-amber-800 border-amber-200',
+    error: 'bg-red-50 text-[#ee0000] border-red-200',
+    outline: 'bg-transparent text-[#4d4d4d] border-[#ebebeb]',
+    cyan: 'bg-cyan-50 text-cyan-800 border-cyan-200',
+    emerald: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    amber: 'bg-amber-50 text-amber-800 border-amber-200',
+    crimson: 'bg-red-50 text-red-800 border-red-200',
   }
 
   const dotColors: Record<string, string> = {
-    default: 'bg-text-muted',
-    info: 'bg-cyan-400',
-    success: 'bg-emerald-400',
-    warning: 'bg-amber-400',
-    error: 'bg-rose-400',
-    outline: 'bg-text-muted',
-    cyan: 'bg-cyan-400',
-    emerald: 'bg-emerald-400',
-    amber: 'bg-amber-400',
-    crimson: 'bg-rose-400',
+    default: 'bg-[#8f8f8f]',
+    info: 'bg-[#0070f3]',
+    success: 'bg-emerald-600',
+    warning: 'bg-amber-600',
+    error: 'bg-[#ee0000]',
+    outline: 'bg-[#8f8f8f]',
+    cyan: 'bg-cyan-600',
+    emerald: 'bg-emerald-600',
+    amber: 'bg-amber-600',
+    crimson: 'bg-red-600',
   }
 
   const sizeStyles = {
-    sm: 'text-[11px] px-2 py-0.5 tracking-wider uppercase font-mono font-medium',
-    md: 'text-xs px-2.5 py-1 tracking-wide font-mono font-medium',
+    sm: 'text-[10px] px-2 py-0.5 tracking-wider uppercase font-mono font-medium rounded-full',
+    md: 'text-xs px-2.5 py-1 tracking-wide font-mono font-medium rounded-full',
   }
 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded border transition-colors',
+        'inline-flex items-center gap-1.5 border transition-colors select-none',
         variantStyles[variant] || variantStyles.default,
         sizeStyles[size],
         className

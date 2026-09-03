@@ -4,6 +4,7 @@ import { cn } from '@/utils/cn'
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'info'
   size?: 'xs' | 'sm' | 'md' | 'lg'
+  pill?: boolean
   isLoading?: boolean
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
@@ -16,6 +17,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       variant = 'primary',
       size = 'md',
+      pill = false,
       isLoading = false,
       leftIcon,
       rightIcon,
@@ -25,34 +27,36 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium transition-all duration-150 rounded active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none focus-ring select-none'
+      'inline-flex items-center justify-center font-medium transition-all duration-150 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-[#171717] focus:ring-offset-1 select-none font-sans cursor-pointer'
 
     const variantStyles = {
       primary:
-        'bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold shadow-sm hover:shadow-glow-info border border-cyan-400/30',
+        'bg-[#171717] hover:bg-black text-white shadow-sm border border-[#171717]',
       secondary:
-        'bg-surface-elevated hover:bg-surface-hover text-text-primary border border-border hover:border-border-strong',
+        'bg-white hover:bg-[#f5f5f5] text-[#171717] border border-[#ebebeb] shadow-[0_1px_2px_rgba(0,0,0,0.02)]',
       outline:
-        'bg-transparent hover:bg-surface-elevated text-text-primary border border-border hover:border-border-strong',
+        'bg-transparent hover:bg-[#f5f5f5] text-[#171717] border border-[#ebebeb]',
       ghost:
-        'bg-transparent hover:bg-surface-elevated text-text-secondary hover:text-text-primary border border-transparent',
+        'bg-transparent hover:bg-[#f5f5f5] text-[#4d4d4d] hover:text-[#171717] border border-transparent',
       destructive:
-        'bg-industrial-error-muted hover:bg-red-900/90 text-red-200 border border-industrial-error-border hover:border-red-600 shadow-sm hover:shadow-glow-error',
+        'bg-[#ee0000] hover:bg-[#c50000] text-white border border-[#ee0000] shadow-sm',
       info:
-        'bg-industrial-info-subtle hover:bg-cyan-950/80 text-cyan-300 border border-industrial-info-border hover:border-cyan-400',
+        'bg-[#0070f3] hover:bg-[#0761d1] text-white border border-[#0070f3] shadow-sm',
     }
 
     const sizeStyles = {
-      xs: 'text-[11px] px-2 py-1 gap-1 font-mono',
-      sm: 'text-xs px-2.5 py-1.5 gap-1.5 font-mono',
-      md: 'text-sm px-3.5 py-2 gap-2 font-mono',
-      lg: 'text-base px-5 py-2.5 gap-2.5',
+      xs: 'text-[11px] px-2 py-1 gap-1 font-mono rounded-[4px]',
+      sm: 'text-xs px-2.5 py-1.5 gap-1.5 rounded-[6px]',
+      md: 'text-sm px-3.5 py-2 gap-2 rounded-[6px]',
+      lg: 'text-base px-5 py-2.5 gap-2.5 rounded-[8px]',
     }
+
+    const pillStyle = pill ? 'rounded-full' : ''
 
     return (
       <button
         ref={ref}
-        className={cn(baseStyles, variantStyles[variant], sizeStyles[size], className)}
+        className={cn(baseStyles, variantStyles[variant], sizeStyles[size], pillStyle, className)}
         disabled={disabled || isLoading}
         {...props}
       >

@@ -20,21 +20,21 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded border border-dashed border-border bg-surface-sunken/60 font-mono space-y-4',
+        'flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-[10px] border border-dashed border-[#ebebeb] bg-[#fafafa]/50 font-sans space-y-4',
         className
       )}
       {...props}
     >
-      <div className="p-3 rounded-full bg-surface-elevated border border-border text-text-muted">
-        {icon || <FileQuestion className="w-6 h-6 text-cyan-400" />}
+      <div className="p-3 rounded-full bg-white border border-[#ebebeb] text-[#8f8f8f] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+        {icon || <FileQuestion className="w-5 h-5 text-[#8f8f8f]" />}
       </div>
 
       <div className="space-y-1 max-w-sm">
-        <h4 className="text-sm font-semibold tracking-wide uppercase text-text-primary">
+        <h4 className="text-sm font-semibold tracking-tight text-[#171717]">
           {title}
         </h4>
         {description && (
-          <p className="text-xs text-text-secondary leading-relaxed">{description}</p>
+          <p className="text-xs text-[#8f8f8f] leading-relaxed">{description}</p>
         )}
       </div>
 

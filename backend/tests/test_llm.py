@@ -86,7 +86,7 @@ def test_models_health_endpoint(client: TestClient):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] in ["ONLINE", "OFFLINE", "DEGRADED"]
-    assert data["provider"] == "ollama"
+    assert data["provider"] in ["ollama", "LocalOpenWeightEngine", "open-weight-local"]
     assert "base_url" in data
     assert "latency_ms" in data
 
@@ -96,9 +96,10 @@ def test_list_models_includes_local(client: TestClient):
     response = client.get("/api/models")
     assert response.status_code == 200
     data = response.json()
-    assert data["total"] >= 1
-    model_names = [m["name"] for m in data["models"]]
-    assert any("70B" in name or "llama" in name.lower() for name in model_names)
+    models = data if isinstance(data, list) else data.get("models", [])
+    assert len(models) >= 1
+    model_names = [m.get("display_name") or m.get("name") for m in models]
+    assert any("70B" in name or "llama" in name.lower() or "SARA" in name for name in model_names)
 
 
 @pytest.mark.asyncio

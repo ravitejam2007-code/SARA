@@ -79,7 +79,7 @@ export const Dashboard: React.FC = () => {
       const errorMessage = err instanceof Error ? err.message : 'Telemetry gateway unreachable'
       setError(errorMessage)
       setErrorDetails(
-        `TRACE_ID: zn-dash-${Date.now()}\nTIMESTAMP: ${new Date().toISOString()}\nREASON: Simulated hardware enclave gateway timeout.\nCOMPONENT: ZenithDashboardService::fetchDashboardData`
+        `TRACE_ID: sara-dash-${Date.now()}\nTIMESTAMP: ${new Date().toISOString()}\nREASON: Simulated hardware enclave gateway timeout.\nCOMPONENT: SaraDashboardService::fetchDashboardData`
       )
     } finally {
       setIsLoading(false)
@@ -98,23 +98,24 @@ export const Dashboard: React.FC = () => {
         run.task.toLowerCase().includes(searchQuery.toLowerCase()) ||
         run.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
         run.model.toLowerCase().includes(searchQuery.toLowerCase())
+
       const matchesStatus = statusFilter === 'ALL' || run.status === statusFilter
       return matchesSearch && matchesStatus
     })
   }, [data?.recentRuns, searchQuery, statusFilter])
 
-  // Dynamic user name for greeting
-  const greetingName = user?.name || user?.username || 'Ravi'
+  const greetingName = user?.name || (role ? role.toUpperCase() : 'ENGINEER')
 
-  // Role Badge Styling
-  const roleBadgeVariants: Record<UserRole, 'info' | 'success' | 'amber' | 'default'> = {
+  // Role Badge Variant Mapper
+  const roleBadgeVariants: Record<UserRole, 'info' | 'success' | 'warning' | 'default'> = {
     Admin: 'info',
-    Engineer: 'info',
-    Manager: 'amber',
-    Auditor: 'success',
+    Manager: 'default',
+    Engineer: 'success',
+    Auditor: 'warning',
   }
 
-  const statusBadgeVariant = (status: AgentRunStatus) => {
+  // Status Badge Mapper
+  const getStatusBadgeVariant = (status: AgentRunStatus) => {
     switch (status) {
       case 'COMPLETED':
         return 'success'
@@ -128,22 +129,22 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 font-mono text-text-primary pb-8">
+    <div className="space-y-6 text-[#171717] pb-8 font-sans">
       {/* 1. Header Section */}
-      <div className="rounded-lg bg-surface border border-border p-5 shadow-industrial">
+      <div className="rounded-[10px] bg-white border border-[#ebebeb] p-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           {/* Logo & Welcome Greeting */}
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0 shadow-sm">
+              <div className="h-9 w-9 rounded-[6px] bg-[#171717] text-white flex items-center justify-center shrink-0 shadow-sm">
                 <Layers className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold tracking-wider text-text-primary uppercase flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#171717] flex items-center gap-2 font-sans">
                   <span>Welcome, {greetingName}</span>
                 </h1>
-                <p className="text-xs text-text-secondary">
-                  Zenith AI — Sovereign On-Premise Industrial AI Control Center
+                <p className="text-xs text-[#8f8f8f]">
+                  SARA AI — Sovereign On-Premise Industrial AI Control Center
                 </p>
               </div>
             </div>
@@ -152,14 +153,14 @@ export const Dashboard: React.FC = () => {
           {/* Right Header Metadata & System Security Indicator */}
           <div className="flex flex-wrap items-center gap-3">
             {/* System Security Indicator */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-surface-elevated border border-emerald-800/60 text-xs text-emerald-300">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium font-mono">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
               </span>
-              <span className="font-bold tracking-wider uppercase">System Secure</span>
-              <span className="text-border-strong">|</span>
-              <span className="text-text-muted text-[10px]">AIR-GAPPED ENCLAVE</span>
+              <span className="font-semibold tracking-wide uppercase">System Secure</span>
+              <span className="text-emerald-300">|</span>
+              <span className="text-emerald-700 text-[10px]">AIR-GAPPED ENCLAVE</span>
             </div>
 
             {/* Current Role Badge */}
@@ -185,9 +186,9 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Development Placeholder Notice & UI State Simulation Bar */}
-        <div className="mt-4 pt-3 border-t border-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-text-muted text-[11px]">
-            <span className="px-1.5 py-0.5 rounded bg-amber-950/40 border border-amber-800/40 text-amber-400 font-semibold">
+        <div className="mt-4 pt-3 border-t border-[#ebebeb] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-[#8f8f8f] text-[11px] font-mono">
+            <span className="px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800 font-semibold">
               DEV MODE
             </span>
             <span>
@@ -196,16 +197,16 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* UI State Controls for Review */}
-          <div className="flex items-center gap-1.5 shrink-0 text-[11px]">
-            <span className="text-text-muted mr-1">SIMULATE STATE:</span>
+          <div className="flex items-center gap-1.5 shrink-0 text-[11px] font-mono">
+            <span className="text-[#8f8f8f] mr-1 uppercase">SIMULATE:</span>
             {(['normal', 'loading', 'empty', 'error'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setSimulatedState(mode)}
-                className={`px-2 py-0.5 rounded border uppercase font-medium transition-colors ${
+                className={`px-2 py-0.5 rounded-[4px] border uppercase font-medium transition-colors cursor-pointer ${
                   simulatedState === mode
-                    ? 'bg-cyan-950/80 border-cyan-500 text-cyan-300'
-                    : 'bg-surface-sunken border-border text-text-muted hover:text-text-primary'
+                    ? 'bg-[#171717] border-[#171717] text-white'
+                    : 'bg-[#fafafa] border-[#ebebeb] text-[#8f8f8f] hover:text-[#171717]'
                 }`}
               >
                 {mode}
@@ -233,117 +234,117 @@ export const Dashboard: React.FC = () => {
       {/* 2. 6 KPI Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {/* KPI 1: Active Models */}
-        <div className="rounded-md bg-surface border border-border p-4 shadow-industrial hover:border-cyan-500/40 transition-all">
-          <div className="flex items-center justify-between text-text-muted mb-2">
+        <div className="rounded-[10px] bg-white border border-[#ebebeb] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all">
+          <div className="flex items-center justify-between text-[#8f8f8f] mb-2 font-mono">
             <span className="text-[11px] uppercase font-semibold">Active Models</span>
-            <Cpu className="w-4 h-4 text-cyan-400" />
+            <Cpu className="w-4 h-4 text-[#171717]" />
           </div>
           {isLoading ? (
             <Skeleton variant="text" width="60%" height={28} />
           ) : (
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-bold text-text-primary">
+            <div className="flex items-baseline gap-1.5 font-mono">
+              <span className="text-2xl font-bold text-[#171717]">
                 {data?.kpis.activeModels ?? 4}
               </span>
-              <span className="text-xs text-text-muted">/ {data?.kpis.activeModelsTotal ?? 4}</span>
+              <span className="text-xs text-[#8f8f8f]">/ {data?.kpis.activeModelsTotal ?? 4}</span>
             </div>
           )}
-          <div className="text-[10px] text-emerald-400 mt-2 flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" />
+          <div className="text-[10px] text-emerald-700 mt-2 flex items-center gap-1 font-mono font-medium">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
             Local Enclave
           </div>
         </div>
 
         {/* KPI 2: Documents Processed */}
-        <div className="rounded-md bg-surface border border-border p-4 shadow-industrial hover:border-cyan-500/40 transition-all">
-          <div className="flex items-center justify-between text-text-muted mb-2">
+        <div className="rounded-[10px] bg-white border border-[#ebebeb] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all">
+          <div className="flex items-center justify-between text-[#8f8f8f] mb-2 font-mono">
             <span className="text-[11px] uppercase font-semibold">Documents</span>
-            <FileText className="w-4 h-4 text-emerald-400" />
+            <FileText className="w-4 h-4 text-[#171717]" />
           </div>
           {isLoading ? (
             <Skeleton variant="text" width="60%" height={28} />
           ) : (
-            <div className="text-2xl font-bold text-text-primary">
+            <div className="text-2xl font-bold text-[#171717] font-mono">
               {data?.kpis.documentsProcessed ?? 37}
             </div>
           )}
-          <div className="text-[10px] text-text-muted mt-2">STEP, CAD & Specs</div>
+          <div className="text-[10px] text-[#8f8f8f] mt-2 font-mono">STEP, CAD & Specs</div>
         </div>
 
         {/* KPI 3: Agent Runs */}
-        <div className="rounded-md bg-surface border border-border p-4 shadow-industrial hover:border-cyan-500/40 transition-all">
-          <div className="flex items-center justify-between text-text-muted mb-2">
+        <div className="rounded-[10px] bg-white border border-[#ebebeb] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all">
+          <div className="flex items-center justify-between text-[#8f8f8f] mb-2 font-mono">
             <span className="text-[11px] uppercase font-semibold">Agent Runs</span>
-            <Sparkles className="w-4 h-4 text-amber-400" />
+            <Sparkles className="w-4 h-4 text-[#171717]" />
           </div>
           {isLoading ? (
             <Skeleton variant="text" width="60%" height={28} />
           ) : (
-            <div className="text-2xl font-bold text-text-primary">
+            <div className="text-2xl font-bold text-[#171717] font-mono">
               {data?.kpis.agentRuns ?? 12}
             </div>
           )}
-          <div className="text-[10px] text-cyan-400 mt-2">Completed Today</div>
+          <div className="text-[10px] text-[#8f8f8f] mt-2 font-mono">Completed Today</div>
         </div>
 
         {/* KPI 4: Generated Deliverables */}
-        <div className="rounded-md bg-surface border border-border p-4 shadow-industrial hover:border-cyan-500/40 transition-all">
-          <div className="flex items-center justify-between text-text-muted mb-2">
+        <div className="rounded-[10px] bg-white border border-[#ebebeb] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all">
+          <div className="flex items-center justify-between text-[#8f8f8f] mb-2 font-mono">
             <span className="text-[11px] uppercase font-semibold">Deliverables</span>
-            <Package className="w-4 h-4 text-cyan-400" />
+            <Package className="w-4 h-4 text-[#171717]" />
           </div>
           {isLoading ? (
             <Skeleton variant="text" width="60%" height={28} />
           ) : (
-            <div className="text-2xl font-bold text-text-primary">
+            <div className="text-2xl font-bold text-[#171717] font-mono">
               {data?.kpis.generatedDeliverables ?? 8}
             </div>
           )}
-          <div className="text-[10px] text-emerald-400 mt-2">Signed & Validated</div>
+          <div className="text-[10px] text-emerald-700 mt-2 font-mono font-medium">Signed & Validated</div>
         </div>
 
         {/* KPI 5: External API Calls */}
-        <div className="rounded-md bg-surface border border-border p-4 shadow-industrial hover:border-cyan-500/40 transition-all">
-          <div className="flex items-center justify-between text-text-muted mb-2">
+        <div className="rounded-[10px] bg-white border border-[#ebebeb] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all">
+          <div className="flex items-center justify-between text-[#8f8f8f] mb-2 font-mono">
             <span className="text-[11px] uppercase font-semibold">External Calls</span>
-            <Radio className="w-4 h-4 text-text-muted" />
+            <Radio className="w-4 h-4 text-[#8f8f8f]" />
           </div>
           {isLoading ? (
             <Skeleton variant="text" width="60%" height={28} />
           ) : (
-            <div className="text-2xl font-bold text-emerald-400">
+            <div className="text-2xl font-bold text-emerald-700 font-mono">
               {data?.kpis.externalApiCalls ?? 0}
             </div>
           )}
-          <div className="text-[10px] text-emerald-400 mt-2 font-semibold">
+          <div className="text-[10px] text-emerald-700 mt-2 font-semibold font-mono">
             0 B Egress / Air-Gapped
           </div>
         </div>
 
         {/* KPI 6: Local Services Status */}
-        <div className="rounded-md bg-surface border border-border p-4 shadow-industrial hover:border-cyan-500/40 transition-all">
-          <div className="flex items-center justify-between text-text-muted mb-2">
+        <div className="rounded-[10px] bg-white border border-[#ebebeb] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all">
+          <div className="flex items-center justify-between text-[#8f8f8f] mb-2 font-mono">
             <span className="text-[11px] uppercase font-semibold">Local Services</span>
-            <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <Activity className="w-4 h-4 text-emerald-600" />
           </div>
           {isLoading ? (
             <Skeleton variant="text" width="60%" height={28} />
           ) : (
-            <div className="text-base font-bold text-emerald-300">
+            <div className="text-base font-bold text-emerald-700 font-mono">
               {data?.kpis.localServicesStatus ?? 'OPERATIONAL'}
             </div>
           )}
-          <div className="text-[10px] text-text-muted mt-2">
-            {data?.kpis.servicesHealthyCount ?? 5}/{data?.kpis.servicesTotalCount ?? 5} Services Healthy
+          <div className="text-[10px] text-[#8f8f8f] mt-2 font-mono">
+            {data?.kpis.servicesHealthyCount ?? 5}/{data?.kpis.servicesTotalCount ?? 5} Healthy
           </div>
         </div>
       </div>
 
       {/* 3. Quick Actions Bar */}
-      <div className="p-3.5 rounded-lg bg-surface border border-border flex flex-col sm:flex-row items-center justify-between gap-3 shadow-industrial">
-        <div className="flex items-center gap-2 text-xs text-text-secondary">
-          <span className="text-cyan-400 font-bold uppercase tracking-wider">COMMAND SHORTCUTS:</span>
-          <span className="text-text-muted hidden md:inline">Instant dispatch to sovereign engineering modules</span>
+      <div className="p-3.5 rounded-[10px] bg-white border border-[#ebebeb] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+        <div className="flex items-center gap-2 text-xs text-[#4d4d4d]">
+          <span className="text-[#171717] font-semibold uppercase tracking-wider font-mono">COMMAND SHORTCUTS:</span>
+          <span className="text-[#8f8f8f] hidden md:inline">Instant dispatch to sovereign engineering modules</span>
         </div>
 
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -392,14 +393,14 @@ export const Dashboard: React.FC = () => {
           <CardHeader>
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-cyan-400" />
+                <Activity className="w-4 h-4 text-[#171717]" />
                 HOURLY AGENT TASK EXECUTIONS & INFERENCE THROUGHPUT
               </CardTitle>
               <CardDescription>
                 Air-gapped tokens processed per second vs. scheduled engineering task completions
               </CardDescription>
             </div>
-            <Badge variant="info" size="sm">
+            <Badge variant="default" size="sm">
               TELEMETRY: 24H
             </Badge>
           </CardHeader>
@@ -417,33 +418,35 @@ export const Dashboard: React.FC = () => {
                   >
                     <defs>
                       <linearGradient id="dashboardThroughputGlow" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                        <stop offset="5%" stopColor="#171717" stopOpacity={0.15} />
+                        <stop offset="95%" stopColor="#171717" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ebebeb" />
                     <XAxis
                       dataKey="time"
-                      stroke="#64748b"
-                      tick={{ fontSize: 11, fontFamily: 'JetBrains Mono' }}
+                      stroke="#8f8f8f"
+                      tick={{ fontSize: 11, fontFamily: 'Geist Mono, monospace' }}
                     />
                     <YAxis
-                      stroke="#64748b"
-                      tick={{ fontSize: 11, fontFamily: 'JetBrains Mono' }}
+                      stroke="#8f8f8f"
+                      tick={{ fontSize: 11, fontFamily: 'Geist Mono, monospace' }}
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#0f172a',
-                        border: '1px solid #334155',
-                        borderRadius: '4px',
-                        fontFamily: 'JetBrains Mono',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #ebebeb',
+                        borderRadius: '6px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                        fontFamily: 'Geist Mono, monospace',
                         fontSize: '12px',
+                        color: '#171717',
                       }}
                     />
                     <Area
                       type="monotone"
                       dataKey="throughputTokPerSec"
-                      stroke="#06b6d4"
+                      stroke="#171717"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#dashboardThroughputGlow)"
@@ -461,7 +464,7 @@ export const Dashboard: React.FC = () => {
           <CardHeader>
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-emerald-400" />
+                <Lock className="w-4 h-4 text-[#171717]" />
                 SECURITY SUMMARY (ON-PREMISE)
               </CardTitle>
               <CardDescription>
@@ -479,20 +482,20 @@ export const Dashboard: React.FC = () => {
               data?.securitySummary.map((item) => (
                 <div
                   key={item.id}
-                  className="p-2.5 rounded bg-surface-sunken border border-border space-y-1 hover:border-border-strong transition-colors"
+                  className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] space-y-1 hover:border-[#d4d4d4] transition-colors"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-text-primary">
+                    <span className="text-xs font-semibold text-[#171717]">
                       {item.label}
                     </span>
                     <Badge variant={item.badgeVariant} size="sm">
                       {item.status}
                     </Badge>
                   </div>
-                  <div className="text-[11px] text-cyan-400 font-semibold truncate">
+                  <div className="text-[11px] text-[#171717] font-semibold truncate font-mono">
                     {item.telemetry}
                   </div>
-                  <div className="text-[10px] text-text-muted truncate">
+                  <div className="text-[10px] text-[#8f8f8f] truncate font-mono">
                     {item.detail}
                   </div>
                 </div>
@@ -506,13 +509,13 @@ export const Dashboard: React.FC = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-cyan-400" />
-            <h2 className="text-sm font-bold tracking-wider text-text-primary uppercase">
+            <Cpu className="w-4 h-4 text-[#171717]" />
+            <h2 className="text-sm font-semibold tracking-tight text-[#171717] uppercase font-sans">
               LOCAL MODEL ACTIVITY & COMPUTE LOAD
             </h2>
           </div>
-          <span className="text-[11px] text-text-muted">
-            DEDICATED FP8 TENSOR ENCLAVES
+          <span className="text-[11px] text-[#8f8f8f] font-mono">
+            DEDICATED SMALL OPEN-WEIGHT LOCAL RUNTIMES
           </span>
         </div>
 
@@ -526,10 +529,10 @@ export const Dashboard: React.FC = () => {
               <Card key={model.id} hoverEffect className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h3 className="text-xs font-bold text-cyan-300 truncate">
+                    <h3 className="text-xs font-bold text-[#171717] truncate font-sans">
                       {model.name}
                     </h3>
-                    <p className="text-[10px] text-text-muted mt-0.5 line-clamp-1">
+                    <p className="text-[10px] text-[#8f8f8f] mt-0.5 line-clamp-1 font-mono">
                       {model.capability}
                     </p>
                   </div>
@@ -543,9 +546,9 @@ export const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5 pt-1">
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-text-secondary">Compute Load</span>
-                    <span className="text-text-primary font-bold">{model.currentLoad}%</span>
+                  <div className="flex justify-between text-[11px] font-mono">
+                    <span className="text-[#4d4d4d]">Compute Load</span>
+                    <span className="text-[#171717] font-bold">{model.currentLoad}%</span>
                   </div>
                   <ProgressBar
                     value={model.currentLoad}
@@ -554,7 +557,7 @@ export const Dashboard: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-text-muted pt-2 border-t border-border/60">
+                <div className="flex items-center justify-between text-[10px] text-[#8f8f8f] pt-2 border-t border-[#ebebeb] font-mono">
                   <span>VRAM: {model.vramUsage}</span>
                   <span>CTX: {model.contextLimit}</span>
                 </div>
@@ -570,7 +573,7 @@ export const Dashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+                <Sparkles className="w-4 h-4 text-[#171717]" />
                 RECENT AGENT RUNS
               </CardTitle>
               <CardDescription>
@@ -593,15 +596,15 @@ export const Dashboard: React.FC = () => {
               </div>
 
               {/* Status Filter Buttons */}
-              <div className="hidden md:flex items-center gap-1 text-[10px]">
+              <div className="hidden md:flex items-center gap-1 text-[10px] font-mono">
                 {(['ALL', 'COMPLETED', 'RUNNING', 'QUEUED'] as const).map((st) => (
                   <button
                     key={st}
                     onClick={() => setStatusFilter(st)}
-                    className={`px-2 py-1 rounded border transition-colors ${
+                    className={`px-2 py-1 rounded-[4px] border transition-colors cursor-pointer ${
                       statusFilter === st
-                        ? 'bg-surface-elevated border-cyan-500 text-cyan-300 font-bold'
-                        : 'bg-surface-sunken border-border text-text-muted hover:text-text-primary'
+                        ? 'bg-[#171717] border-[#171717] text-white font-bold'
+                        : 'bg-[#fafafa] border-[#ebebeb] text-[#8f8f8f] hover:text-[#171717]'
                     }`}
                   >
                     {st}
@@ -638,57 +641,56 @@ export const Dashboard: React.FC = () => {
               }
             />
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-[8px] border border-[#ebebeb]">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-border text-text-secondary text-[11px] bg-surface-sunken/60">
-                    <th className="py-2.5 px-3">TASK</th>
-                    <th className="py-2.5 px-3">USER / OPERATOR</th>
-                    <th className="py-2.5 px-3">MODEL</th>
-                    <th className="py-2.5 px-3">DURATION</th>
-                    <th className="py-2.5 px-3">TIMESTAMP</th>
-                    <th className="py-2.5 px-3 text-right">STATUS</th>
+                  <tr className="border-b border-[#ebebeb] text-[#8f8f8f] text-[11px] bg-[#fafafa]">
+                    <th className="py-2.5 px-3 font-semibold">TASK</th>
+                    <th className="py-2.5 px-3 font-semibold">USER / OPERATOR</th>
+                    <th className="py-2.5 px-3 font-semibold">MODEL</th>
+                    <th className="py-2.5 px-3 font-semibold">DURATION</th>
+                    <th className="py-2.5 px-3 font-semibold">TIMESTAMP</th>
+                    <th className="py-2.5 px-3 font-semibold text-right">STATUS</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/60">
+                <tbody className="divide-y divide-[#ebebeb]">
                   {filteredRuns.map((run) => (
                     <tr
                       key={run.id}
-                      onClick={() => toast.info(`Viewing Task Details`, run.task)}
-                      className="hover:bg-surface-elevated/70 transition-colors cursor-pointer group"
+                      className="hover:bg-[#fafafa] transition-colors cursor-pointer group"
+                      onClick={() => navigate('/assistant')}
                     >
                       <td className="py-3 px-3">
-                        <div className="font-semibold text-text-primary group-hover:text-cyan-300 transition-colors">
+                        <div className="font-semibold text-[#171717] group-hover:text-[#0070f3] transition-colors">
                           {run.task}
                         </div>
-                        <div className="text-[10px] text-text-muted mt-0.5">
-                          ID: {run.id} {run.tokensProcessed ? `• ${run.tokensProcessed.toLocaleString()} tokens` : ''}
+                        <div className="text-[10px] text-[#8f8f8f] font-mono">
+                          ID: {run.id}
                         </div>
                       </td>
-
-                      <td className="py-3 px-3 text-text-secondary whitespace-nowrap">
+                      <td className="py-3 px-3 text-[#4d4d4d] whitespace-nowrap">
                         {run.user}
                       </td>
-
-                      <td className="py-3 px-3">
-                        <span className="px-1.5 py-0.5 rounded bg-surface-sunken border border-border text-cyan-300 text-[11px]">
+                      <td className="py-3 px-3 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded bg-[#fafafa] border border-[#ebebeb] text-[11px] text-[#171717] font-mono">
                           {run.model}
                         </span>
                       </td>
-
-                      <td className="py-3 px-3 text-text-muted whitespace-nowrap">
+                      <td className="py-3 px-3 text-[#8f8f8f] font-mono whitespace-nowrap">
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {run.duration}
                         </span>
                       </td>
-
-                      <td className="py-3 px-3 text-text-muted whitespace-nowrap">
+                      <td className="py-3 px-3 text-[#8f8f8f] font-mono whitespace-nowrap">
                         {run.timestamp}
                       </td>
-
                       <td className="py-3 px-3 text-right whitespace-nowrap">
-                        <Badge variant={statusBadgeVariant(run.status)} size="sm" dot>
+                        <Badge
+                          variant={getStatusBadgeVariant(run.status)}
+                          size="sm"
+                          dot={run.status === 'RUNNING'}
+                        >
                           {run.status}
                         </Badge>
                       </td>
@@ -703,5 +705,3 @@ export const Dashboard: React.FC = () => {
     </div>
   )
 }
-
-export default Dashboard

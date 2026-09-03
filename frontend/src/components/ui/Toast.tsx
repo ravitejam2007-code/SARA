@@ -8,7 +8,7 @@ export interface ToastItem {
   id: string
   title: string
   description?: string
-  variant?: ToastVariant
+  variant: ToastVariant
   duration?: number
 }
 
@@ -36,7 +36,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const addToast = useCallback(
     ({ title, description, variant = 'info', duration = 4000 }: Omit<ToastItem, 'id'>) => {
-      const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`
+      const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       const newToast: ToastItem = { id, title, description, variant, duration }
 
       setToasts((prev) => [...prev, newToast])
@@ -87,17 +87,10 @@ interface ToastContainerProps {
 
 const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
   const variantIcons = {
-    info: <Info className="w-4 h-4 text-cyan-400" />,
-    success: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
-    warning: <AlertTriangle className="w-4 h-4 text-amber-400" />,
-    error: <AlertOctagon className="w-4 h-4 text-rose-400" />,
-  }
-
-  const variantBorders = {
-    info: 'border-cyan-800/80 bg-surface-elevated/95 shadow-glow-info',
-    success: 'border-emerald-800/80 bg-surface-elevated/95 shadow-glow-success',
-    warning: 'border-amber-800/80 bg-surface-elevated/95 shadow-glow-warning',
-    error: 'border-rose-800/80 bg-surface-elevated/95 shadow-glow-error',
+    info: <Info className="w-4 h-4 text-[#0070f3]" />,
+    success: <CheckCircle2 className="w-4 h-4 text-emerald-600" />,
+    warning: <AlertTriangle className="w-4 h-4 text-amber-600" />,
+    error: <AlertOctagon className="w-4 h-4 text-[#ee0000]" />,
   }
 
   return (
@@ -105,31 +98,31 @@ const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => 
       aria-live="polite"
       className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"
     >
-      {toasts.map((item) => (
+      {toasts.map((t) => (
         <div
-          key={item.id}
+          key={t.id}
           className={cn(
-            'pointer-events-auto rounded-md border p-3.5 shadow-industrial-elevated backdrop-blur-md font-mono animate-slide-down flex items-start gap-3 transition-all',
-            variantBorders[item.variant || 'info']
+            'pointer-events-auto flex items-start gap-3 p-3.5 rounded-[8px] bg-white border border-[#ebebeb] shadow-[0_4px_12px_rgba(0,0,0,0.08)] animate-slide-down transition-all font-sans',
           )}
         >
-          <div className="shrink-0 mt-0.5">{variantIcons[item.variant || 'info']}</div>
+          <div className="shrink-0 mt-0.5">{variantIcons[t.variant]}</div>
 
           <div className="flex-1 space-y-0.5">
-            <h5 className="text-xs font-semibold text-text-primary uppercase tracking-wide">
-              {item.title}
+            <h5 className="text-xs font-semibold tracking-tight text-[#171717]">
+              {t.title}
             </h5>
-            {item.description && (
-              <p className="text-[11px] text-text-secondary leading-normal">
-                {item.description}
+            {t.description && (
+              <p className="text-[11px] text-[#8f8f8f] leading-relaxed">
+                {t.description}
               </p>
             )}
           </div>
 
           <button
             type="button"
-            onClick={() => onRemove(item.id)}
-            className="text-text-muted hover:text-text-primary p-0.5 rounded transition-colors"
+            onClick={() => onRemove(t.id)}
+            className="p-1 rounded text-[#8f8f8f] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors cursor-pointer shrink-0"
+            aria-label="Dismiss toast"
           >
             <X className="w-3.5 h-3.5" />
           </button>

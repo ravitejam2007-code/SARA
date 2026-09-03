@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthContext'
 import { EnclaveProvider } from '@/context/EnclaveContext'
 import { ToastProvider } from '@/components/ui/Toast'
@@ -7,6 +7,7 @@ import { AppLayout } from '@/layouts/AppLayout'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 
 // Page Components
+import { Landing } from '@/pages/Landing'
 import { Login } from '@/pages/Login'
 import { Dashboard } from '@/pages/Dashboard'
 import { Assistant } from '@/pages/Assistant'
@@ -14,6 +15,7 @@ import { Documents } from '@/pages/Documents'
 import { KnowledgeBase } from '@/pages/KnowledgeBase'
 import { Workflows } from '@/pages/Workflows'
 import { Deliverables } from '@/pages/Deliverables'
+import { Approvals } from '@/pages/Approvals'
 import { Security } from '@/pages/Security'
 import { AuditLogs } from '@/pages/AuditLogs'
 import { ComponentShowcase } from '@/pages/ComponentShowcase'
@@ -26,6 +28,9 @@ export const App: React.FC = () => {
         <ToastProvider>
           <BrowserRouter>
             <Routes>
+              {/* Public Sovereign Landing Page */}
+              <Route path="/" element={<Landing />} />
+
               {/* Standalone Sovereign Authentication Route */}
               <Route path="/login" element={<Login />} />
 
@@ -37,9 +42,6 @@ export const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               >
-                {/* Default redirect to Dashboard */}
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
                 {/* All Roles */}
                 <Route path="/dashboard" element={<Dashboard />} />
 
@@ -89,6 +91,16 @@ export const App: React.FC = () => {
                   element={
                     <ProtectedRoute allowedRoles={['Engineer', 'Manager', 'Admin', 'Auditor']}>
                       <Deliverables />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Human Approval Gate (Engineer, Manager, Admin) */}
+                <Route
+                  path="/approvals"
+                  element={
+                    <ProtectedRoute allowedRoles={['Engineer', 'Manager', 'Admin']}>
+                      <Approvals />
                     </ProtectedRoute>
                   }
                 />

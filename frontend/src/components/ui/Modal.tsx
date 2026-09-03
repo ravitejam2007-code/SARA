@@ -56,9 +56,9 @@ export const Modal: React.FC<ModalProps> = ({
       role="dialog"
       aria-modal="true"
     >
-      {/* Darkened backdrop with subtle blur */}
+      {/* Subtle translucent backdrop */}
       <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -66,22 +66,22 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Surface */}
       <div
         className={cn(
-          'relative w-full rounded-md bg-surface-elevated border border-border-strong p-6 shadow-industrial-elevated transition-all animate-fade-in z-10 space-y-4',
+          'relative w-full rounded-[12px] bg-white border border-[#ebebeb] p-6 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.08),0_8px_10px_-6px_rgba(0,0,0,0.08)] transition-all animate-fade-in z-10 space-y-4 font-sans',
           sizeClasses[size],
           className
         )}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-start justify-between pb-3 border-b border-border/80">
+          <div className="flex items-start justify-between pb-3 border-b border-[#ebebeb]">
             <div className="space-y-1">
               {title && (
-                <h3 className="text-base font-semibold font-mono tracking-wide text-text-primary uppercase">
+                <h3 className="text-base font-semibold tracking-tight text-[#171717]">
                   {title}
                 </h3>
               )}
               {description && (
-                <p className="text-xs font-mono text-text-secondary">{description}</p>
+                <p className="text-xs text-[#8f8f8f]">{description}</p>
               )}
             </div>
 
@@ -89,7 +89,7 @@ export const Modal: React.FC<ModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1 rounded text-text-muted hover:text-text-primary hover:bg-surface-hover transition-colors focus-ring"
+                className="p-1.5 rounded-[6px] text-[#8f8f8f] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors cursor-pointer"
                 aria-label="Close dialog"
               >
                 <X className="w-4 h-4" />
@@ -98,8 +98,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        {/* Modal Content */}
-        <div className="text-sm text-text-primary font-mono">{children}</div>
+        {children}
       </div>
     </div>
   )
@@ -110,7 +109,11 @@ export const ModalBody: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...props
 }) => {
-  return <div className={cn('py-2 space-y-4', className)} {...props}>{children}</div>
+  return (
+    <div className={cn('py-1 space-y-3', className)} {...props}>
+      {children}
+    </div>
+  )
 }
 
 export const ModalFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
@@ -121,7 +124,7 @@ export const ModalFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   return (
     <div
       className={cn(
-        'pt-4 border-t border-border/80 flex items-center justify-end gap-3',
+        'flex items-center justify-end gap-2 pt-3 border-t border-[#ebebeb]',
         className
       )}
       {...props}

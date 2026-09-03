@@ -6,6 +6,10 @@ backend/.venv/
 backend/storage/*
 !backend/storage/.gitkeep
 backend/test_storage/
+data/outputs/*
+!data/outputs/.gitkeep
+data/uploads/*
+!data/uploads/.gitkeep
 *.db
 *.sqlite3
 __pycache__/

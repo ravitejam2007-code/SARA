@@ -23,23 +23,22 @@ export const StatCard: React.FC<StatCardProps> = ({
   unit,
   trend,
   icon,
-  statusVariant = 'cyan',
   caption,
   className,
 }) => {
   return (
-    <Card hoverEffect className={cn('relative overflow-hidden', className)}>
+    <Card hoverEffect className={cn('relative overflow-hidden bg-white border border-[#ebebeb] p-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]', className)}>
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-xs font-mono font-medium tracking-wider uppercase text-slate-400">
+          <span className="text-xs font-mono font-medium tracking-wider uppercase text-[#8f8f8f]">
             {title}
           </span>
           <div className="flex items-baseline gap-1.5 mt-2">
-            <span className="text-2xl font-bold font-mono text-slate-100 tracking-tight">
+            <span className="text-2xl sm:text-3xl font-bold font-mono text-[#171717] tracking-tight">
               {value}
             </span>
             {unit && (
-              <span className="text-xs font-mono text-slate-400 font-medium">
+              <span className="text-xs font-mono text-[#8f8f8f] font-medium">
                 {unit}
               </span>
             )}
@@ -47,13 +46,13 @@ export const StatCard: React.FC<StatCardProps> = ({
         </div>
 
         {icon && (
-          <div className="p-2 rounded bg-slate-800/80 border border-slate-700/60 text-slate-300">
+          <div className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] text-[#171717]">
             {icon}
           </div>
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/80 text-xs">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#ebebeb] text-xs">
         {trend && (
           <Badge
             variant={trend.positive ? 'emerald' : 'amber'}
@@ -65,23 +64,11 @@ export const StatCard: React.FC<StatCardProps> = ({
           </Badge>
         )}
         {caption && (
-          <span className="text-slate-500 font-mono text-[11px] truncate">
+          <span className="text-[#8f8f8f] font-mono text-[11px] truncate">
             {caption}
           </span>
         )}
       </div>
-
-      {/* Subtle top indicator border accent */}
-      <div
-        className={cn(
-          'absolute top-0 left-0 right-0 h-[2px]',
-          statusVariant === 'cyan' && 'bg-cyan-500',
-          statusVariant === 'emerald' && 'bg-emerald-500',
-          statusVariant === 'amber' && 'bg-amber-500',
-          statusVariant === 'crimson' && 'bg-rose-500',
-          statusVariant === 'default' && 'bg-slate-700'
-        )}
-      />
     </Card>
   )
 }

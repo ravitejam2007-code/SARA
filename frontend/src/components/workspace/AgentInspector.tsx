@@ -70,30 +70,30 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
   const getToolIcon = (tool: string) => {
     switch (tool) {
       case 'Python':
-        return <FileCode className="w-3.5 h-3.5 text-cyan-400" />
+        return <FileCode className="w-3.5 h-3.5 text-[#171717]" />
       case 'Excel':
-        return <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+        return <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
       case 'OCR':
-        return <FileText className="w-3.5 h-3.5 text-amber-400" />
+        return <FileText className="w-3.5 h-3.5 text-amber-700" />
       case 'Document Generator':
-        return <Package className="w-3.5 h-3.5 text-blue-400" />
+        return <Package className="w-3.5 h-3.5 text-[#0070f3]" />
       default:
-        return <Wrench className="w-3.5 h-3.5 text-text-muted" />
+        return <Wrench className="w-3.5 h-3.5 text-[#8f8f8f]" />
     }
   }
 
   return (
     <div
       className={cn(
-        'rounded-lg bg-surface border border-border flex flex-col h-full overflow-hidden font-mono shadow-industrial',
+        'rounded-[10px] bg-white border border-[#ebebeb] flex flex-col h-full overflow-hidden font-mono shadow-[0_1px_2px_rgba(0,0,0,0.02)]',
         className
       )}
     >
       {/* Top Inspector Status Bar */}
-      <div className="p-3.5 border-b border-border bg-surface-elevated/70 flex items-center justify-between">
+      <div className="p-3.5 border-b border-[#ebebeb] bg-[#fafafa] flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-cyan-400 animate-pulse" />
-          <span className="text-xs font-bold text-text-primary uppercase tracking-wider">
+          <Activity className="w-4 h-4 text-[#171717]" />
+          <span className="text-xs font-semibold text-[#171717] uppercase tracking-wider">
             AGENT RUNTIME INSPECTOR
           </span>
         </div>
@@ -134,26 +134,26 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
 
           {/* ================= TAB 1: AGENT ACTIVITY ================= */}
           <TabContent value="activity" className="p-3.5 space-y-4 overflow-y-auto max-h-[580px]">
-            {/* Current Task Box */}
-            <div className="p-3 rounded bg-surface-sunken border border-border space-y-1">
-              <div className="flex items-center justify-between text-[11px] text-text-muted">
+            {/* Current Active Task Card */}
+            <div className="p-3 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] space-y-1">
+              <div className="flex items-center justify-between text-[10px] text-[#8f8f8f]">
                 <span className="uppercase font-semibold">Active Operational Task:</span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {elapsedSeconds}s elapsed
                 </span>
               </div>
-              <p className="text-xs font-semibold text-cyan-300 leading-snug">{currentTask}</p>
+              <p className="text-xs font-semibold text-[#171717] leading-snug">{currentTask}</p>
             </div>
 
             {/* Steps Timeline */}
             <div className="space-y-2">
-              <span className="text-[11px] text-text-muted uppercase font-semibold block">
+              <span className="text-[11px] text-[#8f8f8f] uppercase font-semibold block">
                 Execution Progression
               </span>
 
               {steps.length === 0 ? (
-                <div className="p-6 text-center text-text-muted text-xs border border-dashed border-border rounded">
+                <div className="p-6 text-center text-[#8f8f8f] text-xs border border-dashed border-[#ebebeb] rounded-[6px]">
                   No execution steps recorded. Dispatch a prompt to begin orchestration.
                 </div>
               ) : (
@@ -162,31 +162,31 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
                     <div
                       key={step.id}
                       className={cn(
-                        'p-2.5 rounded border text-xs transition-all flex items-start justify-between gap-3',
+                        'p-2.5 rounded-[6px] border text-xs transition-all flex items-start justify-between gap-3',
                         step.status === 'completed'
-                          ? 'bg-surface-elevated/70 border-emerald-900/50 text-text-primary'
+                          ? 'bg-emerald-50/50 border-emerald-200 text-[#171717]'
                           : step.status === 'running'
-                          ? 'bg-cyan-950/40 border-cyan-700/60 text-cyan-200'
-                          : 'bg-surface-sunken border-border text-text-muted'
+                          ? 'bg-[#f5f5f5] border-[#171717] text-[#171717]'
+                          : 'bg-[#fafafa] border-[#ebebeb] text-[#8f8f8f]'
                       )}
                     >
                       <div className="flex items-start gap-2.5">
                         <div className="mt-0.5 shrink-0">
                           {step.status === 'completed' && (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                           )}
                           {step.status === 'running' && (
-                            <span className="h-3.5 w-3.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin block" />
+                            <span className="h-3.5 w-3.5 border-2 border-[#171717] border-t-transparent rounded-full animate-spin block" />
                           )}
                           {step.status === 'pending' && (
-                            <span className="h-2 w-2 rounded-full bg-slate-600 block my-1" />
+                            <span className="h-2 w-2 rounded-full bg-[#8f8f8f] block my-1" />
                           )}
                         </div>
 
                         <div>
-                          <div className="font-semibold">{step.title}</div>
+                          <div className="font-semibold text-[#171717]">{step.title}</div>
                           {step.outputSummary && (
-                            <p className="text-[11px] text-text-muted mt-0.5 leading-normal">
+                            <p className="text-[11px] text-[#8f8f8f] mt-0.5 leading-normal">
                               {step.outputSummary}
                             </p>
                           )}
@@ -195,12 +195,12 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
 
                       <div className="text-right shrink-0">
                         {step.toolName && (
-                          <Badge variant="info" size="sm" className="text-[9px] py-0">
+                          <Badge variant="default" size="sm" className="text-[9px] py-0">
                             {step.toolName}
                           </Badge>
                         )}
                         {step.elapsedMs !== undefined && (
-                          <div className="text-[10px] text-text-muted mt-0.5">
+                          <div className="text-[10px] text-[#8f8f8f] mt-0.5">
                             {step.elapsedMs}ms
                           </div>
                         )}
@@ -212,37 +212,37 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
             </div>
           </TabContent>
 
-          {/* ================= TAB 2: TOOL CALLS (7 INDUSTRIAL TOOLS) ================= */}
+          {/* ================= TAB 2: TOOL INVOCATIONS ================= */}
           <TabContent value="tools" className="p-3.5 space-y-3 overflow-y-auto max-h-[580px]">
-            <div className="flex items-center justify-between text-[11px] text-text-muted">
-              <span className="uppercase font-semibold">Tool Invocation Ledger</span>
-              <span>7 Integrated Tools</span>
+            <div className="flex items-center justify-between text-[11px] text-[#8f8f8f]">
+              <span className="uppercase font-semibold">Local Sandboxed Tools</span>
+              <span>Total Invocations: {toolCalls.length}</span>
             </div>
 
             {toolCalls.length === 0 ? (
-              <div className="p-6 text-center text-text-muted text-xs border border-dashed border-border rounded">
-                No tool invocations recorded in this session.
+              <div className="p-6 text-center text-[#8f8f8f] text-xs border border-dashed border-[#ebebeb] rounded-[6px]">
+                No deterministic tool calls executed yet.
               </div>
             ) : (
               toolCalls.map((tc) => (
                 <div
                   key={tc.id}
-                  className="rounded border border-border bg-surface-sunken overflow-hidden text-xs space-y-2 p-3"
+                  className="rounded-[6px] border border-[#ebebeb] bg-[#fafafa] overflow-hidden text-xs space-y-2 p-3"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {getToolIcon(tc.tool)}
-                      <span className="font-bold text-text-primary uppercase">{tc.tool}</span>
+                      <span className="font-semibold text-[#171717] uppercase">{tc.tool}</span>
                     </div>
-                    <Badge variant={tc.status === 'completed' ? 'success' : 'info'} size="sm">
+                    <Badge variant={tc.status === 'completed' ? 'success' : 'default'} size="sm">
                       {tc.status}
                     </Badge>
                   </div>
 
                   {/* Tool Input */}
                   <div className="space-y-1">
-                    <span className="text-[10px] text-text-muted uppercase">Input:</span>
-                    <pre className="p-2 rounded bg-[#050811] border border-border/80 text-[11px] text-cyan-300 overflow-x-auto whitespace-pre-wrap">
+                    <span className="text-[10px] text-[#8f8f8f] uppercase">Input:</span>
+                    <pre className="p-2 rounded-[6px] bg-white border border-[#ebebeb] text-[11px] text-[#171717] overflow-x-auto whitespace-pre-wrap">
                       {tc.input}
                     </pre>
                   </div>
@@ -251,7 +251,7 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
                   {tc.output && (
                     <div className="space-y-1">
                       <span className="text-[10px] text-text-muted uppercase">Output Result:</span>
-                      <pre className="p-2 rounded bg-[#050811] border border-border/80 text-[11px] text-emerald-300 overflow-x-auto whitespace-pre-wrap">
+                      <pre className="p-2 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] text-[11px] text-[#171717] overflow-x-auto whitespace-pre-wrap">
                         {tc.output}
                       </pre>
                     </div>
@@ -270,10 +270,10 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
           <TabContent value="model" className="p-3.5 space-y-4 overflow-y-auto max-h-[580px]">
             {modelInfo ? (
               <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-surface-sunken border border-cyan-500/40 space-y-3">
+                <div className="p-4 rounded-lg bg-white border border-[#ebebeb] space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-cyan-300 flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-cyan-400" />
+                    <span className="text-xs font-bold text-[#171717] flex items-center gap-2">
+                      <Cpu className="w-4 h-4 text-[#171717]" />
                       {modelInfo.modelName}
                     </span>
                     <Badge variant="success" size="sm" dot>
@@ -300,7 +300,7 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border text-[11px]">
                     <div className="p-2 rounded bg-surface border border-border">
                       <span className="text-text-muted block text-[10px]">INFERENCE LATENCY</span>
-                      <span className="text-cyan-400 font-bold">{modelInfo.latencyMs}ms</span>
+                      <span className="text-[#171717] font-bold">{modelInfo.latencyMs}ms</span>
                     </div>
                     <div className="p-2 rounded bg-surface border border-border">
                       <span className="text-text-muted block text-[10px]">MAX CONTEXT</span>
@@ -338,7 +338,7 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
                     <div className="flex items-start justify-between gap-2">
                       <div className="space-y-0.5 min-w-0">
                         <div className="font-semibold text-text-primary truncate flex items-center gap-1.5">
-                          <BookOpen className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                          <BookOpen className="w-3.5 h-3.5 text-[#171717] shrink-0" />
                           <span className="truncate">{src.filename}</span>
                         </div>
                         <div className="text-[10px] text-text-muted">
@@ -356,14 +356,14 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
                       <button
                         type="button"
                         onClick={() => setExpandedSourceId(isExpanded ? null : src.id)}
-                        className="flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold transition-colors cursor-pointer"
+                        className="flex items-center gap-1 text-[11px] text-[#171717] hover:underline font-semibold transition-colors cursor-pointer"
                       >
                         <span>{isExpanded ? 'Hide Citation Snippet' : 'Inspect Snippet'}</span>
                         {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
 
                       {isExpanded && (
-                        <div className="mt-2 p-2.5 rounded bg-[#050811] border border-border/80 text-[11px] text-text-secondary leading-relaxed relative">
+                        <div className="mt-2 p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] text-[11px] text-[#4d4d4d] leading-relaxed relative font-sans">
                           <p>{src.snippet}</p>
                           <button
                             type="button"
@@ -372,8 +372,8 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
                           >
                             {copiedSnippetId === src.id ? (
                               <>
-                                <Check className="w-3 h-3 text-emerald-400" />
-                                <span className="text-emerald-400">Copied</span>
+                                <Check className="w-3 h-3 text-emerald-600" />
+                                <span className="text-emerald-700">Copied</span>
                               </>
                             ) : (
                               <>
@@ -406,12 +406,12 @@ export const AgentInspector: React.FC<AgentInspectorProps> = ({
               artifacts.map((art) => (
                 <div
                   key={art.id}
-                  className="p-3 rounded-lg border border-border bg-surface-sunken space-y-2 hover:border-cyan-500/40 transition-all"
+                  className="p-3 rounded-lg border border-border bg-white space-y-2 hover:border-[#d4d4d4] transition-all shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="space-y-0.5 min-w-0">
                       <div className="font-bold text-text-primary text-xs truncate flex items-center gap-1.5">
-                        <Package className="w-4 h-4 text-cyan-400 shrink-0" />
+                        <Package className="w-4 h-4 text-[#171717] shrink-0" />
                         <span className="truncate">{art.filename}</span>
                       </div>
                       <div className="text-[10px] text-text-muted">

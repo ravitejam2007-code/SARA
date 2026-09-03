@@ -16,7 +16,7 @@ export const SovereigntySummaryGrid: React.FC<SovereigntySummaryGridProps> = ({
     {
       id: 'ext-api',
       title: 'EXTERNAL API CALLS',
-      icon: <Radio className="w-4 h-4 text-cyan-400" />,
+      icon: <Radio className="w-4 h-4 text-[#171717]" />,
       metric: summary?.externalApiCalls,
       displayValue:
         summary?.externalApiCalls.value !== null && summary?.externalApiCalls.value !== undefined
@@ -29,7 +29,7 @@ export const SovereigntySummaryGrid: React.FC<SovereigntySummaryGridProps> = ({
     {
       id: 'cloud-model',
       title: 'CLOUD MODEL CALLS',
-      icon: <CloudOff className="w-4 h-4 text-emerald-400" />,
+      icon: <CloudOff className="w-4 h-4 text-[#171717]" />,
       metric: summary?.cloudModelCalls,
       displayValue:
         summary?.cloudModelCalls.value !== null && summary?.cloudModelCalls.value !== undefined
@@ -42,7 +42,7 @@ export const SovereigntySummaryGrid: React.FC<SovereigntySummaryGridProps> = ({
     {
       id: 'ext-dns',
       title: 'EXTERNAL DNS REQUESTS',
-      icon: <Globe className="w-4 h-4 text-blue-400" />,
+      icon: <Globe className="w-4 h-4 text-[#171717]" />,
       metric: summary?.externalDnsRequests,
       displayValue:
         summary?.externalDnsRequests.value !== null && summary?.externalDnsRequests.value !== undefined
@@ -55,7 +55,7 @@ export const SovereigntySummaryGrid: React.FC<SovereigntySummaryGridProps> = ({
     {
       id: 'egress-bytes',
       title: 'NETWORK EGRESS',
-      icon: <ArrowUpRight className="w-4 h-4 text-amber-400" />,
+      icon: <ArrowUpRight className="w-4 h-4 text-[#171717]" />,
       metric: summary?.networkEgressBytes,
       displayValue: summary?.networkEgressBytes.formatted || 'Unavailable',
       origin: summary?.networkEgressBytes.origin || 'UNAVAILABLE',
@@ -65,7 +65,7 @@ export const SovereigntySummaryGrid: React.FC<SovereigntySummaryGridProps> = ({
     {
       id: 'local-avail',
       title: 'LOCAL SERVICE AVAILABILITY',
-      icon: <Activity className="w-4 h-4 text-purple-400" />,
+      icon: <Activity className="w-4 h-4 text-[#171717]" />,
       metric: summary?.localServiceAvailabilityPercent,
       displayValue:
         summary?.localServiceAvailabilityPercent.value !== null &&
@@ -79,26 +79,26 @@ export const SovereigntySummaryGrid: React.FC<SovereigntySummaryGridProps> = ({
   ]
 
   return (
-    <div className="space-y-3 font-mono">
-      <div className="flex items-center justify-between text-xs text-text-muted">
-        <span className="font-bold uppercase tracking-wider text-text-primary">
+    <div className="space-y-3 font-sans">
+      <div className="flex items-center justify-between text-xs text-[#8f8f8f]">
+        <span className="font-semibold uppercase tracking-wider text-[#171717]">
           SOVEREIGNTY & AIR-GAP POSTURE SUMMARY
         </span>
-        <span>MANDATORY PROVENANCE AUDITING</span>
+        <span className="font-mono text-[10px]">MANDATORY PROVENANCE AUDITING</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         {cards.map((card) => (
           <div
             key={card.id}
-            className="rounded-lg bg-surface border border-border p-4 shadow-industrial flex flex-col justify-between space-y-3 hover:border-border-strong transition-all"
+            className="rounded-[8px] bg-white border border-[#ebebeb] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex flex-col justify-between space-y-3 hover:border-[#d4d4d4] transition-all"
           >
             {/* Header & Icon */}
             <div className="flex items-start justify-between gap-2">
-              <span className="text-[11px] font-bold text-text-muted uppercase leading-tight">
+              <span className="text-[11px] font-semibold text-[#8f8f8f] uppercase leading-tight font-mono">
                 {card.title}
               </span>
-              <div className="p-1.5 rounded bg-surface-sunken border border-border shrink-0">
+              <div className="p-1.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] shrink-0">
                 {card.icon}
               </div>
             </div>
@@ -109,10 +109,8 @@ export const SovereigntySummaryGrid: React.FC<SovereigntySummaryGridProps> = ({
                 <span
                   className={`text-2xl font-bold tracking-tight ${
                     card.displayValue === 'Unavailable' || card.displayValue === '—'
-                      ? 'text-text-muted text-lg'
-                      : card.origin === 'LIVE_API'
-                      ? 'text-emerald-300'
-                      : 'text-text-primary'
+                      ? 'text-[#8f8f8f] text-lg'
+                      : 'text-[#171717]'
                   }`}
                 >
                   {isLoading ? '...' : card.displayValue}
@@ -122,14 +120,14 @@ export const SovereigntySummaryGrid: React.FC<SovereigntySummaryGridProps> = ({
               </div>
 
               {/* Explanatory Note */}
-              <p className="text-[10px] text-text-secondary leading-snug">
+              <p className="text-[10px] text-[#4d4d4d] leading-snug">
                 {card.note}
               </p>
             </div>
 
             {/* Last Updated Timestamp */}
             {card.lastUpdated && (
-              <div className="pt-2 border-t border-border/70 text-[9px] text-text-muted flex justify-between">
+              <div className="pt-2 border-t border-[#ebebeb] text-[9px] text-[#8f8f8f] flex justify-between font-mono">
                 <span>LAST REPORTED:</span>
                 <span>{card.lastUpdated}</span>
               </div>

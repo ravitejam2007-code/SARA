@@ -32,7 +32,7 @@ export const TabList: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
     <div
       role="tablist"
       className={cn(
-        'inline-flex items-center gap-1 rounded bg-surface-sunken p-1 border border-border text-xs font-mono select-none overflow-x-auto max-w-full',
+        'inline-flex items-center gap-1 rounded-[8px] bg-[#f5f5f5] p-1 border border-[#ebebeb] text-xs font-mono select-none overflow-x-auto max-w-full',
         className
       )}
       {...props}
@@ -70,10 +70,10 @@ export const TabTrigger: React.FC<TabTriggerProps> = ({
       disabled={disabled}
       onClick={() => context.setActiveTab(value)}
       className={cn(
-        'flex items-center gap-2 px-3 py-1.5 rounded text-xs font-mono font-medium transition-all focus-ring disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap',
+        'flex items-center gap-2 px-3 py-1.5 rounded-[6px] text-xs font-mono font-medium transition-all focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer',
         isActive
-          ? 'bg-surface-elevated text-cyan-300 shadow-sm border border-border-strong font-semibold'
-          : 'text-text-secondary hover:text-text-primary hover:bg-surface/60',
+          ? 'bg-white text-[#171717] shadow-[0_1px_2px_rgba(0,0,0,0.04)] border border-[#ebebeb] font-semibold'
+          : 'text-[#8f8f8f] hover:text-[#171717] hover:bg-white/50 border border-transparent',
         className
       )}
       {...props}
@@ -103,7 +103,7 @@ export const TabContent: React.FC<TabContentProps> = ({
   return (
     <div
       role="tabpanel"
-      className={cn('animate-fade-in focus-ring', className)}
+      className={cn('animate-fade-in focus:outline-none', className)}
       {...props}
     >
       {children}

@@ -49,7 +49,7 @@ export const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#080b12] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-[#fafafa] text-[#171717] flex flex-col font-sans selection:bg-[#171717] selection:text-white">
       {/* Top Sovereign Enclave Security Posture Banner */}
       <EnclaveBanner />
 
@@ -68,25 +68,25 @@ export const AppLayout: React.FC = () => {
           <Header onToggleMobile={handleToggleMobile} />
 
           {/* Main Content Area */}
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/30 via-[#080b12] to-[#080b12]">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-[#fafafa]">
             <div className="max-w-7xl mx-auto w-full space-y-6">
               <Outlet />
             </div>
           </main>
 
-          {/* Industrial Terminal Footer */}
-          <footer className="py-2.5 px-6 border-t border-slate-800/80 bg-[#090d16] text-[11px] font-mono text-slate-400 flex flex-wrap items-center justify-between gap-2">
+          {/* Vercel Geist Minimalist Footer */}
+          <footer className="py-2.5 px-6 border-t border-[#ebebeb] bg-white text-[11px] font-mono text-[#8f8f8f] flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-3">
-              <span className="text-slate-400 font-semibold">ZENITH INDUSTRIAL AI OS</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-slate-400">ISOLATION: SECURE SGX2</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-slate-400">NETWORK: AIR-GAPPED AIR-01</span>
+              <span className="text-[#171717] font-semibold">SARA SOVEREIGN WORKBENCH</span>
+              <span className="text-[#d4d4d4]">|</span>
+              <span>ISOLATION: AIR-GAPPED HARDWARE</span>
+              <span className="text-[#d4d4d4]">|</span>
+              <span className="text-emerald-700 font-medium">NETWORK: 0 EGRESS (BLOCKED)</span>
             </div>
-            <div className="flex items-center gap-4 text-slate-400">
-              <span>ACTIVE ENCLAVE: ENCLAVE-TITAN-X8</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-emerald-400 font-medium">CRYPTOGRAPHIC AUDIT: 100% VERIFIED</span>
+            <div className="flex items-center gap-4 text-[#8f8f8f]">
+              <span>ACTIVE ENCLAVE: ENCLAVE-SEC-01</span>
+              <span className="text-[#d4d4d4]">|</span>
+              <span className="text-[#171717] font-medium">FIPS 140-3 VERIFIED</span>
             </div>
           </footer>
         </div>

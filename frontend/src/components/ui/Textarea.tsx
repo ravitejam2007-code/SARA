@@ -37,14 +37,14 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           {label && (
             <label
               htmlFor={textareaId}
-              className="block text-xs font-mono font-medium tracking-wide uppercase text-text-secondary"
+              className="block text-xs font-medium text-[#171717]"
             >
               {label}
             </label>
           )}
 
           {characterCount && (
-            <span className="text-[11px] font-mono text-text-muted">
+            <span className="text-[11px] font-mono text-[#8f8f8f]">
               {currentLength}
               {maxCharacters ? ` / ${maxCharacters}` : ' chars'}
             </span>
@@ -59,19 +59,20 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           rows={rows}
           maxLength={maxCharacters}
           className={cn(
-            'w-full rounded bg-surface-sunken border border-border px-3 py-2 text-sm text-text-primary placeholder:text-text-muted font-mono transition-colors focus-ring disabled:opacity-50 disabled:cursor-not-allowed resize-y',
+            'w-full rounded-[6px] bg-white border border-[#ebebeb] px-3 py-2 text-sm text-[#171717] placeholder:text-[#8f8f8f] font-mono transition-all focus:outline-none focus:border-[#171717] focus:ring-1 focus:ring-[#171717] disabled:opacity-50 disabled:cursor-not-allowed resize-y',
             error
-              ? 'border-industrial-error focus-visible:ring-industrial-error'
-              : 'hover:border-border-strong focus-visible:border-border-highlight',
+              ? 'border-red-500 focus:ring-red-500'
+              : 'hover:border-[#d4d4d4]',
             className
           )}
           {...props}
         />
 
-        {error && <p className="text-xs font-mono text-industrial-error">{error}</p>}
-        {!error && helperText && (
-          <p className="text-[11px] font-mono text-text-muted">{helperText}</p>
-        )}
+        {error ? (
+          <p className="text-[11px] text-red-600 font-mono">{error}</p>
+        ) : helperText ? (
+          <p className="text-[11px] text-[#8f8f8f] font-mono">{helperText}</p>
+        ) : null}
       </div>
     )
   }

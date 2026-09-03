@@ -36,19 +36,19 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   return (
     <div
       className={cn(
-        'rounded-md border border-industrial-error-border bg-industrial-error-subtle p-5 font-mono space-y-4 text-xs',
+        'rounded-[8px] border border-red-200 bg-red-50/40 p-5 font-sans space-y-4 text-xs',
         className
       )}
       {...props}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded bg-rose-950/80 border border-rose-800/80 text-rose-400 shrink-0">
-            <AlertOctagon className="w-5 h-5" />
+          <div className="p-2 rounded-[6px] bg-red-100 border border-red-200 text-[#ee0000] shrink-0">
+            <AlertOctagon className="w-4 h-4" />
           </div>
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-semibold text-rose-200 tracking-wide uppercase">
+              <h4 className="font-semibold text-[#ee0000] tracking-tight">
                 {title}
               </h4>
               {code && (
@@ -57,16 +57,16 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
                 </Badge>
               )}
             </div>
-            <p className="text-text-secondary leading-relaxed">{description}</p>
+            <p className="text-[#4d4d4d] leading-relaxed">{description}</p>
           </div>
         </div>
 
         {onRetry && (
           <Button
-            variant="destructive"
             size="xs"
-            leftIcon={<RotateCw className="w-3.5 h-3.5" />}
+            variant="outline"
             onClick={onRetry}
+            leftIcon={<RotateCw className="w-3 h-3" />}
             className="shrink-0"
           >
             {retryText}
@@ -75,28 +75,29 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       </div>
 
       {details && (
-        <div className="pt-2 border-t border-rose-900/30">
+        <div className="space-y-2 pt-2 border-t border-red-200/60">
           <button
             type="button"
-            onClick={() => setShowDetails((prev) => !prev)}
-            className="flex items-center gap-1.5 text-[11px] text-rose-400 hover:text-rose-300 transition-colors uppercase font-semibold"
+            onClick={() => setShowDetails(!showDetails)}
+            className="flex items-center gap-1.5 text-[11px] text-[#8f8f8f] hover:text-[#171717] transition-colors cursor-pointer font-mono"
           >
-            <span>{showDetails ? 'Hide Diagnostics' : 'Inspect Diagnostic Dump'}</span>
-            {showDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            <span>{showDetails ? 'Hide technical trace' : 'View technical trace'}</span>
+            {showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
 
           {showDetails && (
-            <div className="mt-2.5 relative">
-              <pre className="p-3 rounded bg-surface-sunken border border-border text-[11px] text-text-muted overflow-x-auto max-h-48 leading-tight font-mono">
+            <div className="relative">
+              <pre className="p-3 rounded-[6px] bg-white border border-red-200 text-[#ee0000] font-mono text-[11px] overflow-x-auto whitespace-pre-wrap leading-relaxed">
                 {details}
               </pre>
+
               <button
                 type="button"
                 onClick={handleCopyDetails}
-                className="absolute top-2 right-2 p-1 rounded bg-surface-elevated border border-border text-text-muted hover:text-text-primary transition-colors"
-                title="Copy diagnostic trace"
+                className="absolute top-2 right-2 p-1 rounded bg-[#fafafa] border border-[#ebebeb] text-[#8f8f8f] hover:text-[#171717] transition-colors"
+                title="Copy trace to clipboard"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
           )}

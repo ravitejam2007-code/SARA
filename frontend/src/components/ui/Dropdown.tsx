@@ -58,13 +58,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
         <div
           role="menu"
           className={cn(
-            'absolute z-50 mt-1.5 w-48 rounded bg-surface-elevated border border-border-strong py-1 shadow-industrial-elevated animate-slide-down focus-ring',
+            'absolute z-50 mt-1.5 w-48 rounded-[8px] bg-white border border-[#ebebeb] py-1 shadow-[0_4px_12px_rgba(0,0,0,0.08)] animate-slide-down focus:outline-none',
             align === 'right' ? 'right-0' : 'left-0'
           )}
         >
           {items.map((item, index) => {
             if (item.separator) {
-              return <div key={`sep-${index}`} className="my-1 border-t border-border/80" />
+              return <div key={`sep-${index}`} className="my-1 border-t border-[#ebebeb]" />
             }
 
             return (
@@ -77,13 +77,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   setIsOpen(false)
                 }}
                 className={cn(
-                  'flex w-full items-center gap-2.5 px-3 py-1.5 text-xs font-mono transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed',
+                  'flex w-[calc(100%-8px)] mx-1 items-center gap-2.5 px-2.5 py-1.5 text-xs font-sans rounded-[4px] transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer',
                   item.destructive
-                    ? 'text-rose-400 hover:bg-rose-950/40 hover:text-rose-300'
-                    : 'text-text-secondary hover:bg-surface-hover hover:text-text-primary'
+                    ? 'text-[#ee0000] hover:bg-red-50 hover:text-[#ee0000]'
+                    : 'text-[#4d4d4d] hover:bg-[#f5f5f5] hover:text-[#171717]'
                 )}
               >
-                {item.icon && <span className="shrink-0 flex items-center">{item.icon}</span>}
+                {item.icon && <span className="shrink-0 flex items-center text-[#8f8f8f]">{item.icon}</span>}
                 <span className="truncate">{item.label}</span>
               </button>
             )

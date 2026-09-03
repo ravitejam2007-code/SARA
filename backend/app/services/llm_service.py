@@ -24,24 +24,14 @@ from app.utils.logger import logger
 _default_provider: Optional[BaseLLMProvider] = None
 
 
+from app.models.local_engine import LocalOpenWeightEngine
+
 def get_llm_provider() -> BaseLLMProvider:
-    """Factory retrieving configured local inference provider."""
+    """Factory retrieving configured local open-weight inference provider."""
     global _default_provider
     if _default_provider is None:
-        provider_name = settings.LLM_PROVIDER.lower()
-        if provider_name == "ollama":
-            logger.info(f"Initializing local Ollama provider at {settings.OLLAMA_BASE_URL}")
-            _default_provider = OllamaClient(
-                base_url=settings.OLLAMA_BASE_URL,
-                default_model=settings.DEFAULT_LLM_MODEL,
-                default_vision_model=settings.DEFAULT_VISION_MODEL,
-                timeout_seconds=settings.LLM_TIMEOUT_SECONDS,
-                allow_offline_fallback=True,
-            )
-        else:
-            # Future vLLM / llama.cpp provider hook
-            logger.info(f"Using Ollama provider as standard local gateway for '{provider_name}'")
-            _default_provider = OllamaClient()
+        logger.info("Initializing SARA Sovereign Open-Weight Local Inference Engine (Zero-GPU required)")
+        _default_provider = LocalOpenWeightEngine()
 
     return _default_provider
 

@@ -146,17 +146,17 @@ export const Workflows: React.FC = () => {
   const getWorkflowIcon = (iconName: string) => {
     switch (iconName) {
       case 'ClipboardCheck':
-        return <ClipboardCheck className="w-5 h-5 text-amber-400" />
+        return <ClipboardCheck className="w-5 h-5 text-amber-700" />
       case 'FileCode2':
-        return <FileCode2 className="w-5 h-5 text-cyan-400" />
+        return <FileCode2 className="w-5 h-5 text-[#171717]" />
       case 'FileText':
-        return <FileText className="w-5 h-5 text-blue-400" />
+        return <FileText className="w-5 h-5 text-[#0070f3]" />
       case 'FileSpreadsheet':
-        return <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
+        return <FileSpreadsheet className="w-5 h-5 text-emerald-700" />
       case 'Scan':
-        return <Scan className="w-5 h-5 text-purple-400" />
+        return <Scan className="w-5 h-5 text-purple-700" />
       default:
-        return <GitBranch className="w-5 h-5 text-text-muted" />
+        return <GitBranch className="w-5 h-5 text-[#8f8f8f]" />
     }
   }
 
@@ -166,35 +166,36 @@ export const Workflows: React.FC = () => {
       <div className="rounded-lg bg-surface border border-border p-5 shadow-industrial">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded bg-cyan-950/60 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
-              <GitBranch className="w-5 h-5" />
+            <div className="h-8 w-8 rounded-[6px] bg-[#171717] flex items-center justify-center text-white shrink-0 shadow-sm">
+              <GitBranch className="w-4 h-4" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-wider text-text-primary uppercase flex items-center gap-2">
+              <h1 className="text-xl font-semibold tracking-tight text-[#171717] flex items-center gap-2">
                 <span>AUTONOMOUS ENGINEERING WORKFLOWS</span>
               </h1>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-[#8f8f8f]">
                 Deterministic Pipelines • Certified Deliverables • Hardware Enclave Execution
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge variant="success" size="md" dot>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
               ORCHESTRATOR ONLINE
-            </Badge>
+            </span>
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-border/80 flex items-center justify-between text-xs text-text-muted">
+        <div className="mt-4 pt-3 border-t border-[#ebebeb] flex items-center justify-between text-xs text-[#8f8f8f]">
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="px-1.5 py-0.5 rounded bg-amber-950/40 border border-amber-800/40 text-amber-400 font-semibold">
+            <span className="px-1.5 py-0.5 rounded bg-[#f5f5f5] border border-[#ebebeb] text-[#171717] font-semibold">
               LIVE EXECUTION
             </span>
             <span>Workflow progression is driven dynamically by backend orchestration events.</span>
           </div>
 
-          <div className="flex items-center gap-1 text-[11px] text-cyan-400">
+          <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>FIPS 140-3 COMPLIANT ENCLAVES</span>
           </div>
@@ -206,20 +207,20 @@ export const Workflows: React.FC = () => {
         {workflows.map((wf) => (
           <div
             key={wf.id}
-            className="rounded-lg bg-surface border border-border p-5 flex flex-col justify-between shadow-industrial hover:border-cyan-500/50 transition-all space-y-4 group"
+            className="rounded-[10px] bg-white border border-[#ebebeb] p-5 flex flex-col justify-between shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-[#d4d4d4] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all space-y-4 group"
           >
             {/* Card Header */}
             <div className="space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded bg-surface-sunken border border-border group-hover:border-cyan-500/40 transition-colors">
+                  <div className="p-2.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] group-hover:border-[#d4d4d4] transition-colors">
                     {getWorkflowIcon(wf.iconName)}
                   </div>
                   <div>
-                    <h2 className="text-sm font-bold text-text-primary group-hover:text-cyan-300 transition-colors">
+                    <h2 className="text-sm font-semibold text-[#171717] group-hover:text-[#0070f3] transition-colors font-sans">
                       {wf.title}
                     </h2>
-                    <span className="text-[10px] text-text-muted uppercase">
+                    <span className="text-[10px] text-[#8f8f8f] uppercase font-mono">
                       {wf.category}
                     </span>
                   </div>
@@ -231,27 +232,27 @@ export const Workflows: React.FC = () => {
               </div>
 
               {/* Description */}
-              <p className="text-xs text-text-secondary leading-relaxed line-clamp-3">
+              <p className="text-xs text-[#4d4d4d] leading-relaxed line-clamp-3 font-sans">
                 {wf.description}
               </p>
             </div>
 
             {/* Middle: Sequential Steps Flow Preview */}
-            <div className="space-y-2 pt-2 border-t border-border/70">
-              <div className="flex items-center justify-between text-[11px] text-text-muted">
-                <span className="uppercase font-semibold">Pipeline Steps:</span>
-                <span className="text-cyan-400 font-bold">{wf.steps.length} STAGES</span>
+            <div className="space-y-2 pt-2 border-t border-[#ebebeb]">
+              <div className="flex items-center justify-between text-[11px] text-[#8f8f8f]">
+                <span className="uppercase font-semibold font-mono">Pipeline Steps:</span>
+                <span className="text-[#171717] font-bold font-mono">{wf.steps.length} STAGES</span>
               </div>
 
               {/* Step Sequence Breadcrumbs */}
               <div className="flex flex-wrap items-center gap-1 text-[10px]">
                 {wf.steps.map((step, idx) => (
                   <React.Fragment key={step.id}>
-                    <span className="px-1.5 py-0.5 rounded bg-surface-sunken border border-border text-text-secondary font-mono">
+                    <span className="px-1.5 py-0.5 rounded bg-[#fafafa] border border-[#ebebeb] text-[#4d4d4d] font-mono">
                       {step.name}
                     </span>
                     {idx < wf.steps.length - 1 && (
-                      <ChevronRight className="w-2.5 h-2.5 text-border-strong shrink-0" />
+                      <ChevronRight className="w-2.5 h-2.5 text-[#8f8f8f] shrink-0" />
                     )}
                   </React.Fragment>
                 ))}
@@ -259,17 +260,17 @@ export const Workflows: React.FC = () => {
             </div>
 
             {/* Bottom: Inputs & Action Button */}
-            <div className="space-y-3 pt-3 border-t border-border/70">
+            <div className="space-y-3 pt-3 border-t border-[#ebebeb]">
               <div className="flex items-center justify-between text-[11px]">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-text-muted text-[10px] uppercase font-semibold">
+                  <span className="text-[#8f8f8f] text-[10px] uppercase font-semibold font-mono">
                     INPUTS:
                   </span>
                   <div className="flex gap-1">
                     {wf.inputTypes.map((inp) => (
                       <span
                         key={inp}
-                        className="px-1.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-700/50 text-cyan-300 text-[9px] font-bold"
+                        className="px-1.5 py-0.5 rounded bg-[#fafafa] border border-[#ebebeb] text-[#171717] text-[9px] font-medium font-mono"
                       >
                         {inp}
                       </span>
@@ -277,7 +278,7 @@ export const Workflows: React.FC = () => {
                   </div>
                 </div>
 
-                <span className="text-[10px] text-text-muted flex items-center gap-1">
+                <span className="text-[10px] text-[#8f8f8f] flex items-center gap-1 font-mono">
                   <Clock className="w-3 h-3" />
                   {wf.estimatedDuration}
                 </span>
@@ -308,23 +309,23 @@ export const Workflows: React.FC = () => {
         {activeSession && (
           <ModalBody className="space-y-4">
             {/* Top Status & Progress Bar */}
-            <div className="p-3.5 rounded bg-surface-sunken border border-border space-y-2">
+            <div className="p-3.5 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] space-y-2 font-mono">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="uppercase font-bold text-text-primary flex items-center gap-1.5">
+                  <span className="uppercase font-bold text-[#171717] flex items-center gap-1.5">
                     {activeSession.status === 'RUNNING' && (
-                      <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+                      <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
                     )}
                     STATUS: {activeSession.status}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 text-text-muted">
+                <div className="flex items-center gap-3 text-[#8f8f8f]">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
                     {activeSession.elapsedSeconds}s elapsed
                   </span>
-                  <span className="font-bold text-cyan-400">
+                  <span className="font-bold text-[#171717]">
                     {activeSession.progressPercent}%
                   </span>
                 </div>
@@ -338,8 +339,8 @@ export const Workflows: React.FC = () => {
             </div>
 
             {/* Sequential Steps Progression Timeline */}
-            <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-text-muted block">
+            <div className="space-y-2 font-mono">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#8f8f8f] block">
                 Execution Stages:
               </span>
 
@@ -347,23 +348,23 @@ export const Workflows: React.FC = () => {
                 {activeSession.steps.map((step, idx) => (
                   <div
                     key={step.stepId}
-                    className={`p-2.5 rounded border text-xs flex items-center justify-between gap-2 transition-all ${
+                    className={`p-2.5 rounded-[6px] border text-xs flex items-center justify-between gap-2 transition-all ${
                       step.status === 'completed'
-                        ? 'bg-surface-elevated border-emerald-900/60 text-text-primary'
+                        ? 'bg-emerald-50/50 border-emerald-200 text-[#171717]'
                         : step.status === 'running'
-                        ? 'bg-cyan-950/40 border-cyan-500/70 text-cyan-200'
-                        : 'bg-surface-sunken border-border text-text-muted'
+                        ? 'bg-[#f5f5f5] border-[#171717] text-[#171717]'
+                        : 'bg-[#fafafa] border-[#ebebeb] text-[#8f8f8f]'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       {step.status === 'completed' && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                       )}
                       {step.status === 'running' && (
-                        <span className="h-3.5 w-3.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shrink-0 block" />
+                        <span className="h-3.5 w-3.5 border-2 border-[#171717] border-t-transparent rounded-full animate-spin shrink-0 block" />
                       )}
                       {step.status === 'pending' && (
-                        <span className="h-2 w-2 rounded-full bg-slate-600 shrink-0 block my-1" />
+                        <span className="h-2 w-2 rounded-full bg-[#8f8f8f] shrink-0 block my-1" />
                       )}
                       <span className="font-semibold truncate">
                         {idx + 1}. {step.name}
@@ -371,7 +372,7 @@ export const Workflows: React.FC = () => {
                     </div>
 
                     {step.elapsedMs !== undefined && (
-                      <span className="text-[10px] text-text-muted shrink-0 font-mono">
+                      <span className="text-[10px] text-[#8f8f8f] shrink-0 font-mono">
                         {step.elapsedMs}ms
                       </span>
                     )}
@@ -382,25 +383,25 @@ export const Workflows: React.FC = () => {
 
             {/* Live Terminal Diagnostic Logs Stream */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between text-[11px] text-text-muted">
+              <div className="flex items-center justify-between text-[11px] text-[#8f8f8f]">
                 <span className="flex items-center gap-1.5 uppercase font-semibold">
-                  <Terminal className="w-3.5 h-3.5 text-cyan-400" /> Live Orchestration Logs
+                  <Terminal className="w-3.5 h-3.5 text-[#171717]" /> Live Orchestration Logs
                 </span>
                 <span>REAL-TIME STREAM</span>
               </div>
 
-              <div className="p-3 rounded-md bg-[#050811] border border-border h-40 overflow-y-auto font-mono text-[11px] text-text-secondary leading-relaxed space-y-1 select-text">
+              <div className="p-3 rounded-[6px] bg-[#fafafa] border border-[#ebebeb] h-40 overflow-y-auto font-mono text-[11px] text-[#4d4d4d] leading-relaxed space-y-1 select-text">
                 {activeSession.logs.map((log, i) => (
                   <div
                     key={i}
                     className={
                       log.includes('[SUCCESS]')
-                        ? 'text-emerald-400 font-semibold'
+                        ? 'text-emerald-700 font-semibold'
                         : log.includes('[ABORT]')
-                        ? 'text-rose-400'
+                        ? 'text-red-600 font-semibold'
                         : log.includes('[EXEC]')
-                        ? 'text-cyan-300'
-                        : 'text-text-muted'
+                        ? 'text-[#171717] font-semibold'
+                        : 'text-[#8f8f8f]'
                     }
                   >
                     {log}

@@ -29,17 +29,17 @@ export const Dialog: React.FC<DialogProps> = ({
   const iconConfig = {
     info: {
       icon: Info,
-      color: 'text-cyan-400 bg-cyan-950/60 border-cyan-800/60',
+      color: 'text-[#0070f3] bg-blue-50 border-blue-200',
       btnVariant: 'primary' as const,
     },
     warning: {
       icon: AlertTriangle,
-      color: 'text-amber-400 bg-amber-950/60 border-amber-800/60',
+      color: 'text-amber-800 bg-amber-50 border-amber-200',
       btnVariant: 'secondary' as const,
     },
     destructive: {
       icon: AlertOctagon,
-      color: 'text-rose-400 bg-rose-950/60 border-rose-800/60',
+      color: 'text-[#ee0000] bg-red-50 border-red-200',
       btnVariant: 'destructive' as const,
     },
   }
@@ -48,16 +48,16 @@ export const Dialog: React.FC<DialogProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm" showCloseButton={!isLoading}>
-      <ModalBody className="space-y-4">
+      <ModalBody className="space-y-4 font-sans">
         <div className="flex items-start gap-3.5">
-          <div className={`p-2.5 rounded border ${color} shrink-0`}>
+          <div className={`p-2.5 rounded-[8px] border ${color} shrink-0`}>
             <Icon className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <h4 className="text-sm font-semibold font-mono text-text-primary uppercase">
+            <h4 className="text-sm font-semibold text-[#171717]">
               {title}
             </h4>
-            <p className="text-xs font-mono text-text-secondary leading-relaxed">
+            <p className="text-xs text-[#4d4d4d] leading-relaxed">
               {description}
             </p>
           </div>

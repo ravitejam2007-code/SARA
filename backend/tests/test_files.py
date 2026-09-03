@@ -39,8 +39,9 @@ def test_models_endpoint(client: TestClient):
     response = client.get("/api/models")
     assert response.status_code == 200
     data = response.json()
-    assert data["total"] >= 1
-    assert any(m["name"] == "Zenith-Engineer-70B-FP8" for m in data["models"])
+    models = data if isinstance(data, list) else data.get("models", [])
+    assert len(models) >= 1
+    assert any("SARA" in (m.get("display_name") or m.get("name", "")) for m in models)
 
 
 def test_security_status_endpoint(client: TestClient):

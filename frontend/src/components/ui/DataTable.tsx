@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react'
 import {
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -10,11 +12,12 @@ import {
 import { Input } from './Input'
 import { Button } from './Button'
 import { Skeleton } from './Skeleton'
+import { EmptyState } from './EmptyState'
 import { cn } from '@/utils/cn'
 
 export interface Column<T> {
   key: string
-  header: React.ReactNode
+  header: string
   render?: (row: T) => React.ReactNode
   sortable?: boolean
   width?: string
@@ -23,29 +26,29 @@ export interface Column<T> {
 export interface DataTableProps<T> {
   data: T[]
   columns: Column<T>[]
-  keyExtractor: (row: T) => string | number
+  isLoading?: boolean
   searchable?: boolean
   searchPlaceholder?: string
-  searchFilter?: (row: T, query: string) => boolean
   pageSize?: number
-  isLoading?: boolean
-  emptyMessage?: string
-  className?: string
   onRowClick?: (row: T) => void
+  keyExtractor: (row: T) => string
+  emptyTitle?: string
+  emptyDescription?: string
+  className?: string
 }
 
 export function DataTable<T extends Record<string, any>>({
   data,
   columns,
-  keyExtractor,
+  isLoading = false,
   searchable = true,
   searchPlaceholder = 'Filter records...',
-  searchFilter,
-  pageSize = 5,
-  isLoading = false,
-  emptyMessage = 'No records found matching current criteria.',
-  className,
+  pageSize = 10,
   onRowClick,
+  keyExtractor,
+  emptyTitle = 'No Records Found',
+  emptyDescription = 'No data available matching criteria.',
+  className,
 }: DataTableProps<T>) {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortKey, setSortKey] = useState<string | null>(null)
@@ -55,18 +58,16 @@ export function DataTable<T extends Record<string, any>>({
   // Filter Data
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) return data
+    const query = searchQuery.toLowerCase()
 
-    if (searchFilter) {
-      return data.filter((row) => searchFilter(row, searchQuery))
-    }
-
-    const lowerQuery = searchQuery.toLowerCase()
-    return data.filter((row) =>
-      Object.values(row).some((val) =>
-        String(val).toLowerCase().includes(lowerQuery)
-      )
-    )
-  }, [data, searchQuery, searchFilter])
+    return data.filter((row) => {
+      return Object.keys(row).some((key) => {
+        const val = row[key]
+        if (val === null || val === undefined) return false
+        return String(val).toLowerCase().includes(query)
+      })
+    })
+  }, [data, searchQuery])
 
   // Sort Data
   const sortedData = useMemo(() => {
@@ -76,7 +77,6 @@ export function DataTable<T extends Record<string, any>>({
       const aVal = a[sortKey]
       const bVal = b[sortKey]
 
-      if (aVal === bVal) return 0
       if (aVal === undefined || aVal === null) return 1
       if (bVal === undefined || bVal === null) return -1
 
@@ -133,36 +133,36 @@ export function DataTable<T extends Record<string, any>>({
             />
           </div>
 
-          <div className="text-[11px] text-text-muted hidden sm:block">
-            SHOWING <span className="text-text-primary font-bold">{sortedData.length}</span> ENTRIES
+          <div className="text-[11px] text-[#8f8f8f] hidden sm:block">
+            SHOWING <span className="text-[#171717] font-bold">{sortedData.length}</span> ENTRIES
           </div>
         </div>
       )}
 
       {/* Table Surface */}
-      <div className="overflow-x-auto rounded border border-border bg-surface">
+      <div className="overflow-x-auto rounded-[10px] border border-[#ebebeb] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-border bg-surface-sunken/80 text-text-secondary">
+            <tr className="border-b border-[#ebebeb] bg-[#fafafa] text-[#8f8f8f]">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   style={{ width: col.width }}
                   className={cn(
                     'px-4 py-3 font-semibold uppercase tracking-wider',
-                    col.sortable && 'cursor-pointer select-none hover:text-text-primary transition-colors'
+                    col.sortable && 'cursor-pointer select-none hover:text-[#171717] transition-colors'
                   )}
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
                   <div className="flex items-center gap-1.5">
                     <span>{col.header}</span>
                     {col.sortable && (
-                      <span className="text-text-muted">
+                      <span className="text-[#8f8f8f]">
                         {sortKey === col.key ? (
                           sortDirection === 'asc' ? (
-                            <ArrowUp className="w-3.5 h-3.5 text-cyan-400" />
+                            <ArrowUp className="w-3.5 h-3.5 text-[#171717]" />
                           ) : (
-                            <ArrowDown className="w-3.5 h-3.5 text-cyan-400" />
+                            <ArrowDown className="w-3.5 h-3.5 text-[#171717]" />
                           )
                         ) : (
                           <ArrowUpDown className="w-3.5 h-3.5 opacity-50" />
@@ -175,7 +175,7 @@ export function DataTable<T extends Record<string, any>>({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-border/60">
+          <tbody className="divide-y divide-[#ebebeb]">
             {isLoading ? (
               Array.from({ length: pageSize }).map((_, i) => (
                 <tr key={`loading-row-${i}`}>
@@ -192,12 +192,12 @@ export function DataTable<T extends Record<string, any>>({
                   key={keyExtractor(row)}
                   onClick={() => onRowClick && onRowClick(row)}
                   className={cn(
-                    'hover:bg-surface-elevated/80 transition-colors',
+                    'hover:bg-[#fafafa] transition-colors',
                     onRowClick && 'cursor-pointer'
                   )}
                 >
                   {columns.map((col) => (
-                    <td key={`${keyExtractor(row)}-${col.key}`} className="px-4 py-3 text-text-primary">
+                    <td key={`${keyExtractor(row)}-${col.key}`} className="px-4 py-3 text-[#4d4d4d]">
                       {col.render ? col.render(row) : row[col.key]}
                     </td>
                   ))}
@@ -205,11 +205,8 @@ export function DataTable<T extends Record<string, any>>({
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={columns.length}
-                  className="px-4 py-8 text-center text-text-muted text-xs font-mono"
-                >
-                  {emptyMessage}
+                <td colSpan={columns.length} className="p-8">
+                  <EmptyState title={emptyTitle} description={emptyDescription} />
                 </td>
               </tr>
             )}
@@ -218,31 +215,54 @@ export function DataTable<T extends Record<string, any>>({
       </div>
 
       {/* Pagination Footer */}
-      {!isLoading && sortedData.length > pageSize && (
-        <div className="flex items-center justify-between text-xs text-text-secondary pt-1">
-          <div className="text-[11px] text-text-muted">
-            PAGE <span className="text-text-primary font-bold">{currentPage}</span> OF{' '}
-            <span className="text-text-primary font-bold">{totalPages}</span>
+      {!isLoading && totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-[#8f8f8f]">
+          <div>
+            Page <strong className="text-[#171717]">{currentPage}</strong> of{' '}
+            <strong className="text-[#171717]">{totalPages}</strong> ({sortedData.length} records)
           </div>
 
           <div className="flex items-center gap-1.5">
             <Button
               variant="outline"
               size="xs"
+              onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              leftIcon={<ChevronLeft className="w-3 h-3" />}
+              aria-label="First page"
             >
-              PREV
+              <ChevronsLeft className="w-3.5 h-3.5" />
             </Button>
             <Button
               variant="outline"
               size="xs"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              rightIcon={<ChevronRight className="w-3 h-3" />}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              aria-label="Previous page"
             >
-              NEXT
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </Button>
+
+            <span className="px-2 font-mono text-[11px] text-[#171717] font-semibold">
+              {currentPage} / {totalPages}
+            </span>
+
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              aria-label="Next page"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              aria-label="Last page"
+            >
+              <ChevronsRight className="w-3.5 h-3.5" />
             </Button>
           </div>
         </div>

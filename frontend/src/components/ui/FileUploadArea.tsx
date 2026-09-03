@@ -58,7 +58,9 @@ export const FileUploadArea: React.FC<FileUploadAreaProps> = ({
         const fileExt = '.' + file.name.split('.').pop()?.toLowerCase()
         const isAllowed = acceptedExtensions.some((ext) => ext.toLowerCase() === fileExt)
         if (!isAllowed) {
-          setErrorMessage(`File format "${fileExt}" is not permitted for sovereign ingestion.`)
+          setErrorMessage(
+            `File type "${fileExt}" is not permitted. Supported: ${acceptedExtensions.join(', ')}`
+          )
           continue
         }
       }
@@ -67,9 +69,9 @@ export const FileUploadArea: React.FC<FileUploadAreaProps> = ({
     }
 
     if (validFiles.length > 0) {
-      const updated = multiple ? [...selectedFiles, ...validFiles] : validFiles
-      setSelectedFiles(updated)
-      onFilesSelected(updated)
+      const newFileList = multiple ? [...selectedFiles, ...validFiles] : validFiles
+      setSelectedFiles(newFileList)
+      onFilesSelected(newFileList)
     }
   }
 
@@ -107,10 +109,10 @@ export const FileUploadArea: React.FC<FileUploadAreaProps> = ({
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
         className={cn(
-          'relative flex flex-col items-center justify-center p-8 text-center rounded-md border-2 border-dashed transition-all cursor-pointer select-none',
+          'relative flex flex-col items-center justify-center p-8 text-center rounded-[10px] border border-dashed transition-all cursor-pointer select-none',
           isDragOver
-            ? 'border-cyan-400 bg-cyan-950/20 shadow-glow-info scale-[1.01]'
-            : 'border-border hover:border-border-strong bg-surface-sunken/60 hover:bg-surface-sunken'
+            ? 'border-[#171717] bg-[#f5f5f5]'
+            : 'border-[#ebebeb] hover:border-[#171717] bg-[#fafafa] hover:bg-[#f5f5f5]'
         )}
       >
         <input
@@ -122,54 +124,64 @@ export const FileUploadArea: React.FC<FileUploadAreaProps> = ({
           accept={acceptedExtensions.join(',')}
         />
 
-        <div className="p-3 rounded-full bg-surface-elevated border border-border text-cyan-400 mb-3">
-          <UploadCloud className="w-6 h-6" />
+        <div className="p-3 rounded-full bg-white border border-[#ebebeb] text-[#171717] mb-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <UploadCloud className="w-5 h-5" />
         </div>
 
-        <h4 className="text-sm font-semibold tracking-wide uppercase text-text-primary">
+        <h4 className="text-sm font-semibold tracking-tight text-[#171717] font-sans">
           {label}
         </h4>
-        <p className="text-xs text-text-secondary mt-1 max-w-md">
+        <p className="text-xs text-[#8f8f8f] mt-1 max-w-md font-sans">
           {description}
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-1.5 mt-4">
-          <span className="text-[10px] text-text-muted uppercase mr-1">SUPPORTED:</span>
+          <span className="text-[10px] text-[#8f8f8f] uppercase mr-1">SUPPORTED:</span>
           {acceptedExtensions.map((ext) => (
             <Badge key={ext} variant="default" size="sm" className="text-[10px] py-0">
               {ext}
             </Badge>
           ))}
-          <span className="text-[10px] text-text-muted uppercase ml-1">
-            (MAX {maxFileSizeMB}MB)
-          </span>
         </div>
       </div>
 
-      {/* Validation Alert */}
+      {/* Validation Error Banner */}
       {errorMessage && (
-        <div className="p-2.5 rounded bg-rose-950/40 border border-rose-800/80 text-xs text-rose-300 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+        <div className="flex items-center gap-2 p-3 rounded-[6px] bg-red-50 border border-red-200 text-xs text-[#ee0000]">
+          <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      {/* Staged File List */}
+      {/* Staged File Badges List */}
       {selectedFiles.length > 0 && (
-        <div className="space-y-2 pt-1">
-          <div className="text-xs font-semibold text-text-secondary uppercase">
-            Staged for Ingestion ({selectedFiles.length} files)
+        <div className="space-y-1.5 pt-1">
+          <div className="flex items-center justify-between text-xs text-[#8f8f8f]">
+            <span>STAGED FILES ({selectedFiles.length}):</span>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedFiles([])
+                onFilesSelected([])
+              }}
+              className="text-[11px] text-[#8f8f8f] hover:text-[#ee0000] transition-colors cursor-pointer"
+            >
+              Clear All
+            </button>
           </div>
-          <div className="divide-y divide-border/60 border border-border rounded bg-surface overflow-hidden">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {selectedFiles.map((file, idx) => (
               <div
                 key={`${file.name}-${idx}`}
-                className="flex items-center justify-between px-3 py-2 text-xs hover:bg-surface-elevated transition-colors"
+                className="flex items-center justify-between p-2.5 rounded-[6px] bg-white border border-[#ebebeb] text-xs shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <File className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span className="truncate text-text-primary">{file.name}</span>
-                  <span className="text-text-muted text-[11px] shrink-0">
+                <div className="flex items-center gap-2 overflow-hidden mr-2">
+                  <File className="w-4 h-4 text-[#8f8f8f] shrink-0" />
+                  <span className="truncate text-[#171717] font-medium" title={file.name}>
+                    {file.name}
+                  </span>
+                  <span className="text-[10px] text-[#8f8f8f] shrink-0 font-mono">
                     ({formatFileSize(file.size)})
                   </span>
                 </div>
@@ -180,8 +192,7 @@ export const FileUploadArea: React.FC<FileUploadAreaProps> = ({
                     e.stopPropagation()
                     removeFile(idx)
                   }}
-                  className="p-1 text-text-muted hover:text-rose-400 transition-colors"
-                  title="Remove file"
+                  className="p-1 rounded text-[#8f8f8f] hover:text-[#ee0000] hover:bg-[#f5f5f5] transition-colors cursor-pointer shrink-0"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

@@ -9,7 +9,7 @@ export interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Spinner: React.FC<SpinnerProps> = ({
   size = 'md',
-  variant = 'info',
+  variant = 'default',
   label,
   className,
   ...props
@@ -17,17 +17,17 @@ export const Spinner: React.FC<SpinnerProps> = ({
   const sizeStyles = {
     xs: 'w-3.5 h-3.5 border-[1.5px]',
     sm: 'w-4 h-4 border-2',
-    md: 'w-6 h-6 border-2',
-    lg: 'w-8 h-8 border-[3px]',
-    xl: 'w-12 h-12 border-4',
+    md: 'w-5 h-5 border-2',
+    lg: 'w-8 h-8 border-[2.5px]',
+    xl: 'w-10 h-10 border-3',
   }
 
   const colorStyles = {
-    default: 'border-slate-700 border-t-slate-200',
-    info: 'border-cyan-950 border-t-cyan-400',
-    success: 'border-emerald-950 border-t-emerald-400',
-    warning: 'border-amber-950 border-t-amber-400',
-    error: 'border-rose-950 border-t-rose-400',
+    default: 'border-[#ebebeb] border-t-[#171717]',
+    info: 'border-[#d3e5ff] border-t-[#0070f3]',
+    success: 'border-emerald-200 border-t-emerald-600',
+    warning: 'border-amber-200 border-t-amber-600',
+    error: 'border-red-200 border-t-[#ee0000]',
   }
 
   return (
@@ -43,7 +43,7 @@ export const Spinner: React.FC<SpinnerProps> = ({
           colorStyles[variant]
         )}
       />
-      {label && <span className="text-text-secondary uppercase">{label}</span>}
+      {label && <span className="text-[#8f8f8f] uppercase">{label}</span>}
       <span className="sr-only">Loading...</span>
     </div>
   )

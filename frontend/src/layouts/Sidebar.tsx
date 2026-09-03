@@ -14,8 +14,8 @@ import {
   ChevronRight,
   Shield,
   Layers,
+  ClipboardCheck,
 } from 'lucide-react'
-import { Badge } from '@/components/ui/Badge'
 import { useAuth } from '@/hooks/useAuth'
 import { useEnclave } from '@/hooks/useEnclave'
 import type { UserRole } from '@/types'
@@ -87,6 +87,15 @@ const navItems: NavItem[] = [
     allowedRoles: ['Engineer', 'Manager', 'Admin', 'Auditor'],
   },
   {
+    name: 'Approvals',
+    path: '/approvals',
+    icon: ClipboardCheck,
+    badge: 'GATE',
+    badgeVariant: 'amber',
+    description: 'Human review & countersignature',
+    allowedRoles: ['Engineer', 'Manager', 'Admin'],
+  },
+  {
     name: 'Security & Enclave',
     path: '/security',
     icon: ShieldCheck,
@@ -127,13 +136,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     user ? item.allowedRoles.includes(user.role) : false
   )
 
-  const roleBadgeVariants: Record<UserRole, 'info' | 'success' | 'amber' | 'default'> = {
-    Admin: 'info',
-    Engineer: 'info',
-    Manager: 'amber',
-    Auditor: 'success',
-  }
-
   return (
     <>
       {/* Mobile Backdrop */}
@@ -147,24 +149,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Sidebar Container */}
       <aside
         className={cn(
-          'fixed lg:sticky top-0 left-0 h-screen z-50 flex flex-col bg-[#0b101b] border-r border-border-subtle transition-all duration-300 select-none shrink-0',
+          'fixed lg:sticky top-0 left-0 h-screen z-50 flex flex-col bg-white border-r border-[#ebebeb] transition-all duration-300 select-none shrink-0',
           collapsed ? 'w-20' : 'w-72',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-border/90 bg-[#090d16]">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-[#ebebeb] bg-white">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="h-9 w-9 rounded bg-gradient-to-br from-cyan-500/20 to-blue-600/10 border border-cyan-500/40 flex items-center justify-center shrink-0 shadow-sm shadow-cyan-500/20">
-              <Layers className="w-5 h-5 text-cyan-400" />
+            <div className="h-8 w-8 rounded-[6px] bg-[#171717] flex items-center justify-center text-white shrink-0 shadow-sm">
+              <Layers className="w-4 h-4" />
             </div>
 
             {!collapsed && (
               <div className="flex flex-col leading-none truncate">
-                <span className="font-mono font-bold text-sm tracking-wider text-text-primary flex items-center gap-1.5">
-                  ZENITH<span className="text-cyan-400">AI</span>
+                <span className="font-mono font-bold text-sm tracking-wider text-[#171717] flex items-center gap-1.5">
+                  SARA<span className="text-[#0070f3]">.AI</span>
                 </span>
-                <span className="text-[10px] font-mono text-text-muted tracking-widest uppercase mt-0.5 truncate">
+                <span className="text-[10px] font-mono text-[#8f8f8f] tracking-widest uppercase mt-0.5 truncate">
                   SOVEREIGN WORKBENCH
                 </span>
               </div>
@@ -174,36 +176,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={onToggleCollapse}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="hidden lg:flex p-1.5 rounded text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors"
+            className="hidden lg:flex p-1.5 rounded-[6px] text-[#8f8f8f] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors"
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         </div>
 
         {/* Enclave Quick Status Indicator & Active Role Badge */}
-        <div className="px-3 py-2.5 border-b border-border/60 bg-surface/40">
+        <div className="px-3 py-2.5 border-b border-[#ebebeb] bg-[#fafafa]">
           {!collapsed ? (
-            <div className="p-2.5 rounded bg-surface-sunken/90 border border-border flex items-center justify-between">
+            <div className="p-2.5 rounded-[6px] bg-white border border-[#ebebeb] flex items-center justify-between shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
               <div className="flex items-center gap-2">
-                <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-mono font-semibold text-text-primary">
+                  <span className="text-[11px] font-mono font-semibold text-[#171717]">
                     AIR-GAP ACTIVE
                   </span>
-                  <span className="text-[9px] font-mono text-text-muted">
+                  <span className="text-[9px] font-mono text-[#8f8f8f]">
                     {status.enclaveId}
                   </span>
                 </div>
               </div>
               {user && (
-                <Badge variant={roleBadgeVariants[user.role] || 'info'} size="sm">
+                <span className="px-2 py-0.5 rounded-[4px] bg-[#f5f5f5] border border-[#ebebeb] text-[10px] font-mono font-bold text-[#171717]">
                   {user.role.toUpperCase()}
-                </Badge>
+                </span>
               )}
             </div>
           ) : (
             <div className="flex justify-center" title={`Enclave: Secure | Role: ${user?.role || 'Guest'}`}>
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
           )}
         </div>
@@ -212,9 +214,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
           <div className="px-2 mb-2">
             {!collapsed && (
-              <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-text-muted font-semibold">
+              <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-[#8f8f8f] font-semibold">
                 <span>MODULES</span>
-                {user && <span className="text-cyan-400">{user.role} VIEW</span>}
+                {user && <span className="text-[#171717] font-bold">{user.role} VIEW</span>}
               </div>
             )}
           </div>
@@ -229,35 +231,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 title={collapsed ? item.name : undefined}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-mono transition-all group relative',
+                    'flex items-center gap-3 px-3 py-2 rounded-[6px] text-xs font-mono transition-all group relative',
                     isActive
-                      ? 'bg-surface-elevated text-cyan-300 font-semibold border-l-2 border-cyan-400 shadow-sm'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
+                      ? 'bg-[#171717] text-white font-medium shadow-sm'
+                      : 'text-[#4d4d4d] hover:text-[#171717] hover:bg-[#f5f5f5]'
                   )
                 }
               >
-                <Icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
+                {({ isActive }) => (
+                  <>
+                    <Icon className={cn("w-4 h-4 shrink-0 transition-transform group-hover:scale-105", isActive ? "text-white" : "text-[#8f8f8f]")} />
 
-                {!collapsed && (
-                  <div className="flex-1 flex items-center justify-between truncate">
-                    <span className="truncate">{item.name}</span>
-                    {item.badge && (
-                      <Badge
-                        variant={item.badgeVariant || 'default'}
-                        size="sm"
-                        className="text-[10px] py-0 px-1.5"
-                      >
-                        {item.badge}
-                      </Badge>
+                    {!collapsed && (
+                      <div className="flex-1 flex items-center justify-between truncate">
+                        <span className="truncate">{item.name}</span>
+                        {item.badge && (
+                          <span className={cn("text-[9px] font-bold py-0.5 px-1.5 rounded-[4px]", isActive ? "bg-white/20 text-white" : "bg-[#f5f5f5] text-[#171717] border border-[#ebebeb]")}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
 
-                {/* Tooltip on collapsed hover */}
-                {collapsed && (
-                  <div className="hidden group-hover:block absolute left-full ml-2 px-2.5 py-1 bg-surface-elevated text-text-primary text-xs font-mono rounded shadow-lg border border-border whitespace-nowrap z-50">
-                    {item.name}
-                  </div>
+                    {/* Tooltip on collapsed hover */}
+                    {collapsed && (
+                      <div className="hidden group-hover:block absolute left-full ml-2 px-2.5 py-1 bg-white text-[#171717] text-xs font-mono rounded-[6px] shadow-lg border border-[#ebebeb] whitespace-nowrap z-50">
+                        {item.name}
+                      </div>
+                    )}
+                  </>
                 )}
               </NavLink>
             )
@@ -265,27 +267,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Sidebar Footer / System Hardware Status */}
-        <div className="p-3 border-t border-border/90 bg-[#090d16]">
+        <div className="p-3 border-t border-[#ebebeb] bg-[#fafafa]">
           {!collapsed ? (
-            <div className="space-y-2 text-[11px] font-mono text-text-secondary">
+            <div className="space-y-2 text-[11px] font-mono text-[#4d4d4d]">
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="flex items-center gap-1.5 text-[#8f8f8f]">
+                  <Shield className="w-3.5 h-3.5 text-emerald-600" />
                   CLEARANCE
                 </span>
-                <span className="text-emerald-400 font-bold">{user?.clearanceLevel.split(' ')[0] || 'VERIFIED'}</span>
+                <span className="font-bold text-[#171717]">FIPS 140-3</span>
               </div>
-              <div className="w-full bg-surface-elevated rounded-full h-1 overflow-hidden">
-                <div className="bg-cyan-500 h-1 rounded-full w-full" />
-              </div>
-              <div className="flex justify-between text-[10px] text-text-muted">
-                <span>TERMINAL: {user?.terminalId || 'NODE-01'}</span>
-                <span>HW: SGX2</span>
+              <div className="flex items-center justify-between">
+                <span className="text-[#8f8f8f]">INFERENCE</span>
+                <span className="text-emerald-700 font-bold">100% LOCAL</span>
               </div>
             </div>
           ) : (
-            <div className="flex justify-center" title="Isolation 100%">
-              <Shield className="w-4 h-4 text-cyan-400" />
+            <div className="flex justify-center text-[#8f8f8f]">
+              <Shield className="w-4 h-4 text-emerald-600" />
             </div>
           )}
         </div>

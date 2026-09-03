@@ -4,71 +4,67 @@
 
 @layer base {
   :root {
-    --color-bg: #080b12;
-    --color-surface: #0d1322;
-    --color-surface-elevated: #131b2e;
-    --color-surface-sunken: #06090f;
-    --color-surface-overlay: #172138;
+    --color-bg: #fafafa;
+    --color-surface: #ffffff;
+    --color-surface-elevated: #ffffff;
+    --color-surface-sunken: #fafafa;
+    --color-surface-overlay: #ffffff;
     
-    --color-text-primary: #f8fafc;
-    --color-text-secondary: #94a3b8;
-    --color-text-muted: #64748b;
+    --color-text-primary: #171717;
+    --color-text-secondary: #4d4d4d;
+    --color-text-muted: #8f8f8f;
 
-    --color-border: #1e293b;
-    --color-border-strong: #334155;
+    --color-border: #ebebeb;
+    --color-border-strong: #d4d4d4;
     
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-error: #ef4444;
-    --color-info: #06b6d4;
+    --color-success: #0e703c;
+    --color-warning: #ab570a;
+    --color-error: #c50000;
+    --color-info: #0070f3;
   }
 
   body {
     background-color: var(--color-bg);
     color: var(--color-text-primary);
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
   }
 
-  /* Custom enterprise industrial scrollbars */
+  /* Minimalist Vercel Geist scrollbars */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
-    background: #090d16;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1e293b;
-    border-radius: 3px;
+    background: #ebebeb;
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: #d4d4d4;
   }
 }
 
 @layer utilities {
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-offset-1 focus-visible:ring-offset-[#080b12];
+    @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#171717] focus-visible:ring-offset-1 focus-visible:ring-offset-[#fafafa];
   }
 
-  .industrial-glass {
-    background: rgba(13, 19, 34, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(51, 65, 85, 0.5);
+  .geist-card {
+    background: #ffffff;
+    border: 1px solid #ebebeb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
-  .industrial-card {
-    background: #0d1322;
-    border: 1px solid #1e293b;
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  .geist-card-hover {
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
-
-  .industrial-card-hover {
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .industrial-card-hover:hover {
-    border-color: rgba(6, 182, 212, 0.4);
-    box-shadow: 0 0 20px -4px rgba(6, 182, 212, 0.15);
+  .geist-card-hover:hover {
+    border-color: #d4d4d4;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 }
