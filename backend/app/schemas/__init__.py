@@ -8,6 +8,16 @@ from app.schemas.security import (
     LocalServiceHealthItemSchema,
 )
 from app.schemas.audit import AuditLogResponse, AuditLogListResponse
+from app.schemas.llm import (
+    ChatMessage,
+    ChatRequest,
+    ChatResponse,
+    GenerateRequest,
+    GenerateResponse,
+    VisionRequest,
+    VisionResponse,
+    LLMHealthResponse,
+)
 
 __all__ = [
     "ApiResponse",
@@ -24,4 +34,12 @@ __all__ = [
     "LocalServiceHealthItemSchema",
     "AuditLogResponse",
     "AuditLogListResponse",
+    "ChatMessage",
+    "ChatRequest",
+    "ChatResponse",
+    "GenerateRequest",
+    "GenerateResponse",
+    "VisionRequest",
+    "VisionResponse",
+    "LLMHealthResponse",
 ]

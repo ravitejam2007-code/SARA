@@ -16,6 +16,14 @@ from app.services.audit_service import (
     record_audit_event,
     to_audit_log_response,
 )
+from app.services.llm_service import (
+    get_llm_provider,
+    check_llm_health,
+    list_available_models,
+    execute_chat,
+    execute_generate,
+    execute_vision,
+)
 
 __all__ = [
     "authenticate_user",
@@ -30,4 +38,10 @@ __all__ = [
     "list_audit_logs",
     "record_audit_event",
     "to_audit_log_response",
+    "get_llm_provider",
+    "check_llm_health",
+    "list_available_models",
+    "execute_chat",
+    "execute_generate",
+    "execute_vision",
 ]

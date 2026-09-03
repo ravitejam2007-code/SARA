@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     # Storage Path
     STORAGE_DIR: str = "./storage"
 
+    # Local LLM Infrastructure (Ollama / vLLM on-premise)
+    OLLAMA_BASE_URL: str = "http://127.0.0.1:11434"
+    DEFAULT_LLM_MODEL: str = "llama3.2:3b"
+    DEFAULT_VISION_MODEL: str = "llava:7b"
+    LLM_TIMEOUT_SECONDS: float = 60.0
+    LLM_PROVIDER: str = "ollama"
+
     @property
     def storage_path(self) -> Path:
         p = Path(self.STORAGE_DIR)
