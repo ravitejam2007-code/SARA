@@ -1,6 +1,15 @@
 # Dependencies
 node_modules/
 frontend/node_modules/
+.venv/
+backend/.venv/
+backend/storage/*
+!backend/storage/.gitkeep
+backend/test_storage/
+*.db
+*.sqlite3
+__pycache__/
+*.py[cod]
 
 # Production builds
 dist/
